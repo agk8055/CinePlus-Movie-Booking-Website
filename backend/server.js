@@ -44,6 +44,9 @@ connectDB();
 // --- Initialize Express App ---
 const app = express();
 
+// --- Trust Proxy Configuration ---
+app.set('trust proxy', 1); // Trust first proxy
+
 // --- Security Middleware ---
 app.use(helmet()); // Set various HTTP headers for security
 app.use(cors({
