@@ -264,7 +264,7 @@ server = app.listen(PORT, () => {
         cron.schedule('*/10 * * * *', async () => {
             logger.info('[Scheduler] Making request to prevent cold start...');
             try {
-                const response = await axios.get('https://www.cinplus-backend.com/health');
+                const response = await axios.get('https://cineplus-backend.onrender.com');
                 logger.info(`[Scheduler] Cold start prevention request successful. Status: ${response.status}`);
             } catch (error) {
                 logger.error('[Scheduler] Error in cold start prevention request:', error.message);
