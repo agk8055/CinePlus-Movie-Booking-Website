@@ -47,7 +47,7 @@ const app = express();
 // --- Security Middleware ---
 app.use(helmet()); // Set various HTTP headers for security
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'https://cineplus-frontend.vercel.app/', // Allow frontend URL
+    origin: true, // Allow all origins
     credentials: true // Allow credentials
 })); // Enable CORS with specific configuration
 
