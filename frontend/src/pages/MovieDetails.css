@@ -1,0 +1,228 @@
+.movie-details-wrapper {
+  min-height: 100vh;
+  background-color: #0a0a0a;
+  color: #ffffff;
+  position: relative;
+}
+
+.movie-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70vh;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.backdrop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(10,10,10,0.8) 0%, rgba(10,10,10,1) 100%);
+}
+
+.movie-details-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 4rem;
+}
+
+.movie-details-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 3rem;
+}
+
+.movie-details-poster {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+}
+
+.movie-details-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.movie-details-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.movie-details-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.movie-details-format {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.format-pill {
+  background: rgba(255,255,255,0.15);
+  padding: 0.5rem 1.2rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.age-rating {
+  background: rgba(255,70,70,0.2);
+}
+
+.movie-details-misc {
+  color: #ccc;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.dot-separator {
+  color: #666;
+}
+
+.movie-details-about {
+  margin: 2rem 0;
+}
+
+.movie-details-about h3 {
+  font-size: 1.5rem;
+  color: #75d402;
+  margin-bottom: 1rem;
+}
+
+.movie-details-about p {
+  line-height: 1.7;
+  color: #ddd;
+  font-size: 1.1rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.book-tickets-button {
+  margin-top: 35px;
+  height: 70px;
+  background-color: #75d402;
+  color: #121212;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.ticket-icon {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.book-tickets-button:hover {
+  background-color: #83ea02;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(117,212,2,0.3);
+}
+
+.trailer-button {
+  margin-top: 35px;
+  background-color: #75d402;
+  height: 70px;
+  color: #121212;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.play-icon {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.trailer-button:hover {
+  background-color: #83ea02;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(117,212,2,0.3);
+}
+
+.no-showtimes {
+  color: #888;
+  font-style: italic;
+  padding: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .movie-details-container {
+      grid-template-columns: 1fr;
+      padding: 2rem 1.5rem;
+  }
+
+  .movie-details-poster {
+      max-width: 400px;
+      margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .movie-details-title {
+      font-size: 1.9rem;
+  }
+
+  .movie-details-poster img {
+      height: auto;
+  }
+
+  .action-buttons {
+      flex-direction: column;
+  }
+
+  .book-tickets-button,
+  .trailer-button {
+      width: 100%;
+      justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .movie-details-container {
+      padding: 1.5rem;
+  }
+
+  .movie-details-about p {
+      font-size: 1rem;
+  }
+}

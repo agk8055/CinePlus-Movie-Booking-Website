@@ -1,0 +1,124 @@
+/* SeatBooking.css */
+.seat-booking {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background-color: #0a0a0a;
+    color: #fff;
+    min-height: 100vh;
+    padding-bottom: 100px; /* Add space for fixed bottom bar */
+}
+
+.booking-summary-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0d0c0c;
+    border-top: 2px solid #75d402;
+    padding: 1rem 2rem;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.summary-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.summary-label {
+    color: #888;
+    font-size: 1.1rem;
+}
+
+.summary-value {
+    color: #75d402;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.seat-booking h2 {
+    margin-bottom: 1rem;
+    color: #75d402;
+}
+
+.booking-status {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.booking-status.success {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+
+/* .booking-status.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid #dc3545;
+} */
+
+.book-now-button {
+    background: linear-gradient(135deg, #75d402 0%, #b4ec51 100%);
+    color: #121212;
+    border: none;
+    padding: 0.8rem 2.5rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.book-now-button:hover {
+    transform: translateY(-2px);
+}
+
+.book-now-button:disabled {
+    background: #555;
+    color: #888;
+    cursor: not-allowed;
+    transform: none;
+}
+/* Add to existing SeatBooking.css */
+.booking-alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.booking-alert.error {
+    background-color: rgba(220, 53, 69, 0.2);
+    border: 1px solid #dc3545;
+    color: #dc3545;
+}
+
+.login-link {
+    color: #75d402;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+
+
