@@ -34,17 +34,17 @@ CinePlus is a full-stack movie ticket booking web application. It allows users t
 
 ### 📁 Clone the Repository
 
-bash
+```bash
 git clone https://github.com/your-username/cineplus.git
 cd cineplus
-
+```
 ---
 ## 🔧 Environment Setup (.env Files)
 
 *🔹 Backend – /backend/.env*
 -Create a .env file inside the backend folder with the following variables:
 
-env
+```env
 MONGODB_URI=your_mongodb_atlas_connection_string
 PORT=5000
 # Razorpay Configuration
@@ -55,25 +55,26 @@ RAZORPAY_KEY_SECRET=your_secret_key
 CLOUDINARY_CLOUD_NAME=your_username
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_secret_key
-
+```
 *🔹 Frontend – /frontend/.env*
 -Create a .env file inside the frontend folder with:
-env
+```env
 VITE_RAZORPAY_KEY_ID=your_api_key
-
+```
 -⚠ Make sure to replace the placeholder values with your actual credentials and URIs.
 ---
 ## ▶ Running the App
 *🔹 Start the Backend Server*
-bash
+```bash
 cd backend
 npm install
 npm run dev
-
+```
 -The backend server will start at: http://localhost:5000
 
 *🔹 Start the Frontend Development Server*
-bash
+```bash
 cd frontend
 npm install
 npm run dev
+```
