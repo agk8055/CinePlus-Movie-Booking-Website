@@ -263,14 +263,39 @@ server = app.listen(PORT, () => {
 
     // 2. Cold start prevention job (only in production)
     if (process.env.NODE_ENV === 'production') {
-        logger.info('[Scheduler] Setting up cold start prevention job...');
+        logger.info('[Scheduler] Setting up Render.com cold start prevention job...');
         cron.schedule('*/10 * * * *', async () => {
-            logger.info('[Scheduler] Making request to prevent cold start...');
+            const startTime = Date.now();
+            logger.info('[Scheduler] Making Render.com cold start prevention request...');
             try {
-                const response = await axios.get('https://cineplus-backend.onrender.com');
-                logger.info(`[Scheduler] Cold start prevention request successful. Status: ${response.status}`);
+                // Make request to both root and health endpoints
+                const [rootResponse, healthResponse] = await Promise.all([
+                    axios.get('https://cineplus-backend.onrender.com', {
+                        timeout: 10000,
+                        headers: {
+                            'User-Agent': 'CinePlus-Cron-Job',
+                            'X-Render-Cron': 'true'
+                        }
+                    }),
+                    axios.get('https://cineplus-backend.onrender.com/health', {
+                        timeout: 10000,
+                        headers: {
+                            'User-Agent': 'CinePlus-Cron-Job',
+                            'X-Render-Cron': 'true'
+                        }
+                    })
+                ]);
+                
+                const endTime = Date.now();
+                logger.info(`[Scheduler] Render.com cold start prevention successful. Root: ${rootResponse.status}, Health: ${healthResponse.status}, Response time: ${endTime - startTime}ms`);
             } catch (error) {
-                logger.error('[Scheduler] Error in cold start prevention request:', error.message);
+                logger.error('[Scheduler] Error in Render.com cold start prevention:', {
+                    message: error.message,
+                    code: error.code,
+                    response: error.response?.status,
+                    stack: error.stack,
+                    timestamp: new Date().toISOString()
+                });
             }
         });
     }
