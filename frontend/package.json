@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "start": "vite preview --host",
     "test": "jest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate-icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -43,7 +44,9 @@
     "globals": "^15.14.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "sharp": "^0.34.2",
     "terser": "^5.28.1",
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "vite-plugin-pwa": "^1.0.0"
   }
 }
