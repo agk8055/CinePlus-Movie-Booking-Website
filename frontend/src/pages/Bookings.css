@@ -90,11 +90,11 @@
 }
 
 .qr-code-container {
-    background: white;
+    background: linear-gradient(145deg, #121212, #1a1a1a);
     padding: 0.5rem;
-    border-radius: 8px;
-    border: 1px solid #444;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    /* border-radius: 8px;
+    border: 1px solid #444; */
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); */
 }
 
 .booking-qr-code {

@@ -210,6 +210,8 @@ const Bookings = () => {
                          <div className="qr-code-container">
                              <QRCode 
                                  value={bookingId}
+                                 fgColor='#75d402'
+                                 bgColor='linear-gradient(145deg, #121212, #1a1a1a)'
                                  size={80}
                                  level="M"
                                  className="booking-qr-code"
