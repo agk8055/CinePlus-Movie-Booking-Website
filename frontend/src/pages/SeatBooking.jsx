@@ -99,7 +99,17 @@ const SeatBooking = () => {
     const handleOpenConfirmation = async () => {
         setBookingError('');
         if (!isAuthenticated) {
-            setBookingError('Please log in to book seats.');
+            setBookingError(
+                <div className="login-prompt">
+                    Please login to proceed with booking
+                    <button 
+                        className="login-button" 
+                        onClick={() => navigate('/login', { state: { from: location } })}
+                    >
+                        Login Now
+                    </button>
+                </div>
+            );
             return;
         }
         if (selectedSeatIds.length === 0) {
@@ -171,6 +181,24 @@ const SeatBooking = () => {
 
     if (!details.movie) {
         return <div className="error-message">No showtime details available.</div>;
+    }
+
+    // If not authenticated, show login prompt instead of seat layout and summary
+    if (!isAuthenticated) {
+        return (
+            <div className="seat-booking-container">
+                <h2>Select Seats</h2>
+                <div className="login-prompt">
+                    Please login to proceed with booking
+                    <button 
+                        className="login-button" 
+                        onClick={() => navigate('/login', { state: { from: location } })}
+                    >
+                        Login Now
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     console.log("[SeatBooking] Rendering with details:", { screenId, showtimeId, details });
