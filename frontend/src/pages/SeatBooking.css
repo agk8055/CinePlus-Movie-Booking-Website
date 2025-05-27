@@ -149,5 +149,65 @@
     background-color: #333;
 }
 
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+    .booking-summary-bar {
+        padding: 0.8rem 1rem;
+    }
+
+    .summary-content {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .summary-item {
+        font-size: 0.9rem;
+    }
+
+    .summary-label {
+        font-size: 0.9rem;
+    }
+
+    .summary-value {
+        font-size: 1rem;
+    }
+
+    .selected-seat-labels {
+        font-size: 0.85rem;
+        color: #75d402;
+    }
+
+    .book-now-button {
+        width: 100%;
+        padding: 0.6rem 1.5rem;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+    }
+}
+
+/* Additional spacing for very small screens */
+@media screen and (max-width: 480px) {
+    .booking-summary-bar {
+        padding: 0.6rem 0.8rem;
+    }
+
+    .summary-item {
+        font-size: 0.85rem;
+    }
+
+    .summary-label {
+        font-size: 0.85rem;
+    }
+
+    .summary-value {
+        font-size: 0.95rem;
+    }
+
+    .selected-seat-labels {
+        font-size: 0.8rem;
+    }
+}
+
 
 
