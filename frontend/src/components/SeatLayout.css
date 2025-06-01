@@ -9,21 +9,22 @@
     border-radius: 8px;
     font-family: 'Arial', sans-serif; /* Cleaner font */
     color: #eee; /* Lighter text color */
-    width: 100%;
-    max-width: 800px; /* Set a maximum width for the container */
+    width: 100vw; /* Allow full viewport width */
     margin: 0 auto;
-    
+    overflow-x: auto; /* Enable horizontal scroll */
+    box-sizing: border-box;
 }
 
 .seat-category-section {
     margin-bottom: 30px; /* More space between seat categories */
-    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center; /* Center category content */
     background-color: #121111;
     padding: 15px;
     border-radius: 8px;
+    min-width: 700px;
+    width: max-content;
 }
 
 .seat-category-label {
@@ -38,42 +39,35 @@
 
 .seat-row {
     display: flex;
-    align-items: center; /* Vertically align row label and seats */
-    margin-bottom: 1px; /* Spacing between rows */
-    width: 100%; /* Row takes full width */
-    justify-content: center; /* Center seat row content */
-    position: relative;
+    align-items: center;
+    margin-bottom: 1px;
+    min-width: max-content;
+    justify-content: flex-start;
     background-color: #121111f9 !important;
-    
 }
 
 .row-label {
     color: #ffffff;
     font-size: 1em;
-    margin-right: 15px; /* Space between label and seats */
-    min-width: 25px; /* Ensure consistent width for row labels */
-    text-align: right; /* Right-align row labels */
-    position: absolute;
-    left: 20px; /* Fixed position for row labels */
-   
+    min-width: 32px;      /* Fixed width for alignment */
+    margin-right: 18px;   /* Gap between label and seats */
+    text-align: right;    /* Right-align text in label */
+    position: static;     /* Remove absolute positioning */
 }
 
 .seats {
     display: flex;
-    padding: 2px; /* Padding around seats in a row */
-    border-radius: 5px; /* Rounded corners for seat row area */
-    justify-content: center;
-    width: 100%;
-    max-width: 600px; /* Set a maximum width for the seats container */
-    margin-left: 50px; /* Space for row labels */
-     
+    padding: 2px;
+    border-radius: 5px;
+    min-width: max-content;
+    gap: 8px;
 }
 
 .seat {
-    width: 34px; /* Slightly larger seat width */
-    height: 34px; /* Slightly larger seat height */
+    width: 32px; /* Slightly larger seat width */
+    height: 32px; /* Slightly larger seat height */
     border-radius: 6px; /* More rounded corners for seats */
-    margin: 5px; /* Increased spacing around seats */
+    margin: 3px; /* Increased spacing around seats */
     border: none;
     cursor: pointer;
     font-size: 0.8em; /* Seat number font size */
@@ -177,12 +171,17 @@
 
 /* SeatLayout.css */
 .screen-view {
+    min-width: 700px;
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
     background: linear-gradient(to bottom, #141414, #0d0c0c);
     color: #979797;
     text-align: center;
-    padding: 0.3rem 1.2rem; /* Reduced vertical padding */
-    margin: 1.5rem auto;    /* Adjusted vertical margin */
-    width: 100%;
+    padding: 0.3rem 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
     font-size: 0.9rem;
     letter-spacing: 1px;
     /* text-shadow: 0 2px 4px rgba(117, 212, 2, 0.3); */
