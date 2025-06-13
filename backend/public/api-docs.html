@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinePlus API Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .method {
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .path {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .description {
+            margin-top: 10px;
+            color: #666;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CinePlus API Documentation</h1>
+    <p>Base URL: <code>/api/v1</code></p>
+
+    <div class="section">
+        <h2>Authentication</h2>
+        <div class="endpoint">
+            <div><span class="method">POST</span> <span class="path">/auth/send-otp</span></div>
+            <div class="description">Send OTP for signup verification</div>
+        </div>
+        <div class="endpoint">
+            <div><span class="method">POST</span> <span class="path">/auth/complete-signup</span></div>
+            <div class="description">Verify OTP and complete user registration</div>
+        </div>
+        <div class="endpoint">
+            <div><span class="method">POST</span> <span class="path">/auth/login</span></div>
+            <div class="description">User login</div>
+        </div>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/auth/me</span></div>
+            <div class="description">Get logged in user's profile (Protected)</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Movies</h2>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/movies</span></div>
+            <div class="description">Get all movies</div>
+        </div>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/movies/:id</span></div>
+            <div class="description">Get movie by ID</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Theaters</h2>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/theaters</span></div>
+            <div class="description">Get all theaters</div>
+        </div>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/theaters/:id</span></div>
+            <div class="description">Get theater by ID</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Showtimes</h2>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/showtimes</span></div>
+            <div class="description">Get all showtimes</div>
+        </div>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/showtimes/:id</span></div>
+            <div class="description">Get showtime by ID</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Bookings</h2>
+        <div class="endpoint">
+            <div><span class="method">POST</span> <span class="path">/bookings</span></div>
+            <div class="description">Create a new booking</div>
+        </div>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/bookings/:id</span></div>
+            <div class="description">Get booking by ID</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Seats</h2>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/seats</span></div>
+            <div class="description">Get all seats</div>
+        </div>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/seats/:id</span></div>
+            <div class="description">Get seat by ID</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Cities</h2>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/cities</span></div>
+            <div class="description">Get all cities</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Payments</h2>
+        <div class="endpoint">
+            <div><span class="method">POST</span> <span class="path">/payments</span></div>
+            <div class="description">Create a new payment</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Users</h2>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/users</span></div>
+            <div class="description">Get all users (Admin only)</div>
+        </div>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/users/:id</span></div>
+            <div class="description">Get user by ID</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Theater Dashboard</h2>
+        <div class="endpoint">
+            <div><span class="method">GET</span> <span class="path">/theater/dashboard</span></div>
+            <div class="description">Get theater dashboard data (Theater Admin only)</div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -12,6 +12,7 @@ const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const winston = require('winston');
 const axios = require('axios');
+const path = require('path');
 
 // --- Import Configuration and Controllers ---
 const connectDB = require('./config/db'); // Import the Mongoose connection function
@@ -76,6 +77,18 @@ app.use(morgan('combined', {
 app.use(express.json({ limit: '10kb' })); // Limit JSON payload size
 app.use(express.urlencoded({ extended: true, limit: '10kb' })); // Middleware to parse URL-encoded bodies
 
+// --- Static Files ---
+app.use(express.static(path.join(__dirname, 'public')));
+
+// --- API Documentation ---
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'api-docs.html'));
+});
+
+// --- API Routes ---
+// Mount all routes under /api/v1
+app.use('/api/v1', apiRoutes);
+
 // --- Health Check Endpoint ---
 app.get('/health', (req, res) => {
     res.status(200).json({
@@ -84,16 +97,6 @@ app.get('/health', (req, res) => {
         uptime: process.uptime()
     });
 });
-
-// --- API Routes ---
-// Mount all routes under /api/v1
-app.use('/api/v1', apiRoutes);
-
-// --- Simple Base Route ---
-app.get('/', (req, res) => {
-    res.send('CinePlus API Running');
-});
-
 
 // --- 404 Handler (Not Found) ---
 // Place after all valid routes

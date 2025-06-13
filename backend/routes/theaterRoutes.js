@@ -14,7 +14,7 @@ router.get('/', authenticateJWT, theaterController.getAllTheaters);
 router.post('/', authenticateJWT, authorizeAdmin, theaterController.createTheater);
 
 // GET theaters by search query (must be before /:theaterId route)
-router.get('/search', authenticateJWT, theaterController.searchTheaters);
+router.get('/search', theaterController.searchTheaters);
 
 // GET a specific theater by ID (accessible to logged-in users)
 router.get('/:theaterId', authenticateJWT, theaterController.getTheaterById);
