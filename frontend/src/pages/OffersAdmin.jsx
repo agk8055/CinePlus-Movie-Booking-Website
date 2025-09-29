@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
 import { listOffers, createOfferApi, updateOfferApi, deleteOfferApi } from '../api/api';
+import './OffersAdmin.css';
 
 const initialForm = {
     title: '',
@@ -21,7 +22,8 @@ const OffersAdmin = () => {
     const [error, setError] = useState('');
 
     const loadOffers = async () => {
-        setLoading(true); setError('');
+        setLoading(true);
+        setError('');
         try {
             const res = await listOffers();
             setOffers(res.data || []);
@@ -32,15 +34,21 @@ const OffersAdmin = () => {
         }
     };
 
-    useEffect(() => { loadOffers(); }, []);
+    useEffect(() => {
+        loadOffers();
+    }, []);
 
     const onSubmit = async (e) => {
-        e.preventDefault(); setLoading(true); setError('');
+        e.preventDefault();
+        setLoading(true);
+        setError('');
         try {
             const payload = {
                 title: form.title,
                 type: form.type,
-                condition: form.type === 'conditional' ? { minTickets: Number(form.condition.minTickets || 0) } : { code: String(form.condition.code || '').toUpperCase() },
+                condition: form.type === 'conditional'
+                    ? { minTickets: Number(form.condition.minTickets || 0) }
+                    : { code: String(form.condition.code || '').toUpperCase() },
                 discountType: form.discountType,
                 discountValue: Number(form.discountValue),
                 isActive: Boolean(form.isActive),
@@ -65,15 +73,18 @@ const OffersAdmin = () => {
         setForm({
             title: offer.title,
             type: offer.type,
-            condition: offer.type === 'conditional' ? { minTickets: offer.condition?.minTickets || 0 } : { code: offer.condition?.code || '' },
+            condition: offer.type === 'conditional'
+                ? { minTickets: offer.condition?.minTickets || 0 }
+                : { code: offer.condition?.code || '' },
             discountType: offer.discountType,
             discountValue: offer.discountValue,
             isActive: offer.isActive,
         });
+        window.scrollTo(0, 0);
     };
 
     const onDelete = async (id) => {
-        if (!confirm('Delete this offer?')) return;
+        if (!window.confirm('Are you sure you want to delete this offer?')) return;
         setLoading(true);
         try {
             await deleteOfferApi(id);
@@ -89,20 +100,24 @@ const OffersAdmin = () => {
         return (
             <div className="access-denied">
                 <h1>Access Restricted</h1>
-                <p>Admin only</p>
+                <p>This area is for administrators only.</p>
             </div>
         );
     }
 
     return (
-        <div className="admin-panel-container">
+        <div className="offers-admin-container">
             <h1>Offers & Promo Codes</h1>
             {error && <div className="error">{error}</div>}
 
-            <form onSubmit={onSubmit} className="offer-form" style={{ marginBottom: 20 }}>
+            <form onSubmit={onSubmit} className="offer-form">
                 <div>
                     <label>Title</label>
-                    <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+                    <input
+                        value={form.title}
+                        onChange={(e) => setForm({ ...form, title: e.target.value })}
+                        required
+                    />
                 </div>
                 <div>
                     <label>Type</label>
@@ -113,15 +128,21 @@ const OffersAdmin = () => {
                 </div>
                 {form.type === 'conditional' ? (
                     <div>
-                        <label>Min Tickets</label>
-                        <input type="number" min="0" value={form.condition.minTickets}
-                               onChange={(e) => setForm({ ...form, condition: { ...form.condition, minTickets: e.target.value } })} />
+                        <label>Minimum Tickets</label>
+                        <input
+                            type="number"
+                            min="0"
+                            value={form.condition.minTickets}
+                            onChange={(e) => setForm({ ...form, condition: { ...form.condition, minTickets: e.target.value } })}
+                        />
                     </div>
                 ) : (
                     <div>
                         <label>Promo Code</label>
-                        <input value={form.condition.code}
-                               onChange={(e) => setForm({ ...form, condition: { ...form.condition, code: e.target.value } })} />
+                        <input
+                            value={form.condition.code}
+                            onChange={(e) => setForm({ ...form, condition: { ...form.condition, code: e.target.value } })}
+                        />
                     </div>
                 )}
                 <div>
@@ -133,49 +154,82 @@ const OffersAdmin = () => {
                 </div>
                 <div>
                     <label>Discount Value</label>
-                    <input type="number" min="0" value={form.discountValue}
-                           onChange={(e) => setForm({ ...form, discountValue: e.target.value })} />
+                    <input
+                        type="number"
+                        min="0"
+                        value={form.discountValue}
+                        onChange={(e) => setForm({ ...form, discountValue: e.target.value })}
+                    />
                 </div>
-                <div>
+                <div style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
                     <label>Active</label>
-                    <input type="checkbox" checked={form.isActive}
-                           onChange={(e) => setForm({ ...form, isActive: e.target.checked })} />
+                    <input
+                        type="checkbox"
+                        checked={form.isActive}
+                        onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                    />
                 </div>
-                <button type="submit" disabled={loading}>{editingId ? 'Update' : 'Create'} Offer</button>
-                {editingId && <button type="button" onClick={() => { setEditingId(null); setForm(initialForm); }}>Cancel</button>}
+                <div className="form-buttons">
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Saving...' : (editingId ? 'Update Offer' : 'Create Offer')}
+                    </button>
+                    {editingId && (
+                        <button
+                            type="button"
+                            className="cancel-button"
+                            onClick={() => {
+                                setEditingId(null);
+                                setForm(initialForm);
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </form>
 
-            <table className="offers-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Type</th>
-                        <th>Condition</th>
-                        <th>Discount</th>
-                        <th>Active</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {offers.map(o => (
-                        <tr key={o._id}>
-                            <td>{o.title}</td>
-                            <td>{o.type}</td>
-                            <td>{o.type === 'conditional' ? `minTickets: ${o.condition?.minTickets ?? '-'}` : `code: ${o.condition?.code ?? '-'}`}</td>
-                            <td>{o.discountType} {o.discountValue}</td>
-                            <td>{o.isActive ? 'Yes' : 'No'}</td>
-                            <td>
-                                <button onClick={() => onEdit(o)}>Edit</button>
-                                <button onClick={() => onDelete(o._id)}>Delete</button>
-                            </td>
+            <div className="offers-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Condition</th>
+                            <th>Discount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {offers.map((o) => (
+                            <tr key={o._id}>
+                                <td>{o.title}</td>
+                                <td>{o.type}</td>
+                                <td>
+                                    {o.type === 'conditional'
+                                        ? `Min Tickets: ${o.condition?.minTickets ?? '-'}`
+                                        : `Code: ${o.condition?.code ?? '-'}`}
+                                </td>
+                                <td>
+                                    {o.discountValue}{o.discountType === 'percentage' ? '%' : ' (Flat)'}
+                                </td>
+                                <td>{o.isActive ? 'Active' : 'Inactive'}</td>
+                                <td className="actions-cell">
+                                    <button className="edit-button" onClick={() => onEdit(o)}>Edit</button>
+                                    <button className="delete-button" onClick={() => onDelete(o._id)}>Delete</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
 
 export default OffersAdmin;
+
+
+
 
 
