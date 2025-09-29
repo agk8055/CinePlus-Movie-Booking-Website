@@ -97,8 +97,8 @@
 }
 
 .booking-stats {
-  background-color: rgba(117, 212, 2, 0.1);
-  border: 1px solid rgba(117, 212, 2, 0.3);
+  background-color: rgba(107, 105, 105, 0.1);
+  border: 1px solid rgba(228, 232, 226, 0.3);
   border-radius: 12px; /* Slightly larger radius */
   padding: 0.75rem;
   margin-top: 0;
@@ -138,7 +138,7 @@
   flex-grow: 1;
   text-align: center;
   font-size: 1.05rem;
-  color: #b1ff4d;
+  color: #ffffff;
 }
 
 .stats-display p strong {

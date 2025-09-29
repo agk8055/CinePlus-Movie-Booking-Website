@@ -36,13 +36,13 @@ const MovieDetails = () => {
                     fac.getColorAsync(movieData.poster_url)
                         .then(color => {
                             setBackdropStyle({
-                                background: `linear-gradient(to top right, ${color.hex}, #0a0a0a)`
+                                background: `radial-gradient(ellipse at center, ${color.hex} 0%, #0a0a0a 100%)`
                             });
                         })
                         .catch(e => {
                             console.error("Could not get poster color:", e);
                             setBackdropStyle({
-                                background: `linear-gradient(to top right, #222, #0a0a0a)`
+                                background: `radial-gradient(ellipse at center, #222 0%, #0a0a0a 100%)`
                             });
                         });
                 }
@@ -73,8 +73,10 @@ const MovieDetails = () => {
             }
         };
 
-        fetchStats();
-    }, [id, timeframe]);
+        if (showtimes && showtimes.length > 0) {
+            fetchStats();
+        }
+    }, [id, timeframe, showtimes]);
 
 
     if (loading) {
@@ -131,29 +133,31 @@ const MovieDetails = () => {
                         </div>
                         
                         {/* UPDATED: Booking stats with toggle */}
-                        <div className="booking-stats">
-                            <div className="timeframe-toggle">
-                                <button 
-                                    className={`toggle-btn ${timeframe === '24h' ? 'active' : ''}`}
-                                    onClick={() => setTimeframe('24h')}>
-                                    Last 24h
-                                </button>
-                                <button 
-                                    className={`toggle-btn ${timeframe === '1h' ? 'active' : ''}`}
-                                    onClick={() => setTimeframe('1h')}>
-                                    Last 1h
-                                </button>
+                        {showtimes.length > 0 && (
+                            <div className="booking-stats">
+                                <div className="timeframe-toggle">
+                                    <button 
+                                        className={`toggle-btn ${timeframe === '24h' ? 'active' : ''}`}
+                                        onClick={() => setTimeframe('24h')}>
+                                        Last 24h
+                                    </button>
+                                    <button 
+                                        className={`toggle-btn ${timeframe === '1h' ? 'active' : ''}`}
+                                        onClick={() => setTimeframe('1h')}>
+                                        Last 1h
+                                    </button>
+                                </div>
+                                <div className="stats-display">
+                                    {isStatsLoading ? (
+                                        <span className="stats-loader"></span>
+                                    ) : (
+                                        <p>
+                                            <strong>{bookingCount}</strong> tickets booked in the last {timeframe === '24h' ? '24 hours' : 'hour'}!
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                            <div className="stats-display">
-                                {isStatsLoading ? (
-                                    <span className="stats-loader"></span>
-                                ) : (
-                                    <p>
-                                        <strong>{bookingCount}</strong> tickets booked in the last {timeframe === '24h' ? '24 hours' : 'hour'}!
-                                    </p>
-                                )}
-                            </div>
-                        </div>
+                        )}
 
                         <div className="movie-details-about">
                             <h3>About the movie</h3>
