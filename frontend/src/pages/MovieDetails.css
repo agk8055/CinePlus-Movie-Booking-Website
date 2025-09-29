@@ -395,11 +395,13 @@
   border-radius: 12px;
   padding: 1.5rem;
   position: relative;
+  
 }
 
 .my-review-card {
-  background: rgba(117, 212, 2, 0.05);
-  border-color: rgba(117, 212, 2, 0.2);
+  background: rgba(143, 144, 141, 0.05);
+  border-color: rgba(139, 247, 8, 0.852);
+  margin-bottom: 10px;
 }
 
 .review-header {

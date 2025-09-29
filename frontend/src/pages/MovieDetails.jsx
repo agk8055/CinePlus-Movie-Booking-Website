@@ -288,7 +288,10 @@ const MovieDetails = () => {
                             {typeof movie.avgRatingPoints === 'number' && (
                                 <>
                                     <span className="dot-separator">•</span>
-                                    <span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#75d402">
+                                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                        </svg>
                                         {movie.avgRatingPoints.toFixed(1)} / 5 ({movie.reviewCount || 0} reviews)
                                     </span>
                                 </>
