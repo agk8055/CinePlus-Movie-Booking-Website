@@ -285,7 +285,7 @@ const MovieDetails = () => {
                             })}</span>
                             <span className="dot-separator">•</span>
                             <span>{movie.genre}</span>
-                            {typeof movie.avgRatingPoints === 'number' && (
+                            {typeof movie.avgRatingPoints === 'number' && new Date(movie.release_date) <= new Date() && (
                                 <>
                                     <span className="dot-separator">•</span>
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

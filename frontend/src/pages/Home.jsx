@@ -7,6 +7,7 @@ import api from '../api/api'; // Assuming API functions are exported from api.js
 import UserContext from '../context/UserContext';
 import { useCity } from '../context/CityContext'; // Add this import
 import MovieCard from '../components/MovieCard';
+import GradientText from '../components/GradientText';
 import './Home.css';
 
 const Home = () => {
@@ -97,7 +98,14 @@ const Home = () => {
             <section className="hero-section">
                  {/* ... hero content ... */}
                  <div className="hero-content">
-                    <h1>Experience Cinema Magic</h1>
+                    <h1>
+                        <GradientText
+                          colors={["#58a002", "#75d402", "#b4ec51", "#75d402", "#58a002"]}
+                          animationSpeed={3}
+                        >
+                          Experience Cinema Magic
+                        </GradientText>
+                    </h1>
                     <p>Book tickets for the latest blockbusters in seconds</p>
                     <Link to="/movies" className="cta-button">
                         Explore Movies

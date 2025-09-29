@@ -39,9 +39,6 @@
     margin-bottom: 1.5rem;
     font-weight: 700;
     line-height: 1.2;
-    background: linear-gradient(45deg, #75d402, #b4ec51);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .hero-section p {
