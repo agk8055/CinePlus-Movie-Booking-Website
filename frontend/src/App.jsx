@@ -32,6 +32,8 @@ import AddMultipleShows from './pages/AddMultipleShows';
 import TheaterDetailsPage from './pages/TheaterDetails';
 import QRScanner from './pages/QRScanner';
 import TheaterDashboard from './pages/TheaterDashboard';
+import OffersAdmin from './pages/OffersAdmin';
+import Checkout from './pages/Checkout';
 
 // Create a wrapper component to handle Footer rendering
 const AppContent = () => {
@@ -58,6 +60,8 @@ const AppContent = () => {
                     {/* Admin routes protected by ProtectedRoute component */}
                     <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
                     <Route path="/admin/theater-dashboard" element={<ProtectedRoute><TheaterDashboard /></ProtectedRoute>} />
+                    <Route path="/admin/offers" element={<ProtectedRoute><OffersAdmin /></ProtectedRoute>} />
+                    <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
                     <Route path="/admin/theaters" element={<ProtectedRoute><TheaterList /></ProtectedRoute>} />
                     <Route path="/admin/theaters/:theaterId/screens" element={<ProtectedRoute><ScreenList /></ProtectedRoute>} />
                     <Route path="/admin/theaters/:theaterId/create-screen" element={<ProtectedRoute><CreateScreen /></ProtectedRoute>} />

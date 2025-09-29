@@ -22,8 +22,16 @@ const createOrder = async (req, res) => {
             });
         }
 
+        // Prefer backend booking total to avoid tampering
+        const booking = await Booking.findById(bookingId).lean();
+        if (!booking) {
+            return res.status(404).json({ success: false, message: 'Booking not found' });
+        }
+
+        const payable = Number.isFinite(booking.total_amount) ? booking.total_amount : amount;
+
         const options = {
-            amount: Math.round(amount * 100), // Razorpay expects amount in paise
+            amount: Math.round(payable * 100), // Razorpay expects amount in paise
             currency: 'INR',
             receipt: `receipt_${bookingId}`,
             payment_capture: 1

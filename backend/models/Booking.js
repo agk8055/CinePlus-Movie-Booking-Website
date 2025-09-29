@@ -89,6 +89,13 @@ const bookingSchema = new mongoose.Schema({
     timestamps: true, // Includes createdAt, updatedAt
 });
 
+// Pricing / offer fields
+bookingSchema.add({
+    subtotal_amount: { type: Number, min: 0 },
+    discount_amount: { type: Number, min: 0, default: 0 },
+    applied_offer: { type: mongoose.Schema.Types.Mixed }
+});
+
 // Index for retrieving a user's booking history, sorted by date
 bookingSchema.index({ user_id: 1, booking_date: -1 });
 bookingSchema.index({ user_id: 1, createdAt: -1 }); // Alternative using timestamps

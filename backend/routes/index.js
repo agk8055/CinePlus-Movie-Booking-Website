@@ -11,6 +11,7 @@ const paymentRoutes = require('./paymentRoutes'); // Import payment routes
 const userRoutes = require('./userRoutes');
 const theaterDashboardRoutes = require('./theaterDashboard');
 const reviewRoutes = require('./reviewRoutes');
+const offerRoutes = require('./offerRoutes');
 
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.use('/payments', paymentRoutes); // Mount payment routes
 router.use('/users', userRoutes);
 router.use('/theater', theaterDashboardRoutes);
 router.use('/', reviewRoutes);
+router.use('/offers', offerRoutes);
 
 
 // Example of a direct route definition (you generally should use route files for organization)

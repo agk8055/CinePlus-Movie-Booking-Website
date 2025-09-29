@@ -358,6 +358,32 @@ export const cancelBooking = async (bookingId) => {
     return response.data;
 };
 
+// --- Offers ---
+export const listOffers = async (params = {}) => {
+    const response = await api.get('/offers', { params });
+    return response.data;
+};
+
+export const createOfferApi = async (offer) => {
+    const response = await api.post('/offers', offer);
+    return response.data;
+};
+
+export const updateOfferApi = async (id, offer) => {
+    const response = await api.put(`/offers/${id}`, offer);
+    return response.data;
+};
+
+export const deleteOfferApi = async (id) => {
+    const response = await api.delete(`/offers/${id}`);
+    return response.data;
+};
+
+export const evaluateOfferApi = async ({ numTickets, subtotal, promoCode }) => {
+    const response = await api.post('/offers/evaluate', { numTickets, subtotal, promoCode });
+    return response.data;
+};
+
 // --- Cities ---
 export const getCities = async () => {
     const response = await api.get('/cities');

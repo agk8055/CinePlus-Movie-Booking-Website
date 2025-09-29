@@ -4,7 +4,6 @@ import { useParams, useNavigate, Link, useLocation } from 'react-router-dom'; //
 import SeatLayout from '../components/SeatLayout';
 import { UserContext } from '../context/UserContext';
 import api, { getShowtimeDetailsById, createBooking } from '../api/api';
-import BookingConfirmationModal from '../components/BookingConfirmationModal';
 import './SeatBooking.css';
 
 const SeatBooking = () => {
@@ -26,10 +25,9 @@ const SeatBooking = () => {
     const [error, setError] = useState('');
     const [bookingError, setBookingError] = useState('');
     const [isBooking, setIsBooking] = useState(false);
-    const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
     const [bookingResult, setBookingResult] = useState(null);
-    // State variable for modal details - declared correctly here
-    const [bookingDetailsForModal, setBookingDetailsForModal] = useState(null);
+    const [promoCode, setPromoCode] = useState('');
+    const [discountInfo, setDiscountInfo] = useState({ discount: 0, finalTotal: 0, applied: null });
 
 
     // Fetch Combined Details
@@ -79,7 +77,10 @@ const SeatBooking = () => {
         setSelectedSeatFullData(seatsFullData);
         const newTotal = seatsFullData.reduce((sum, seat) => sum + (seat?.price || 0), 0);
         setTotalAmount(newTotal);
+        setDiscountInfo({ discount: 0, finalTotal: newTotal, applied: null });
     }, []);
+
+    // No evaluation here; moved to Checkout page
 
     // Calculate selected seat labels
     const getSelectedSeatLabels = () => {
@@ -129,20 +130,20 @@ const SeatBooking = () => {
             const response = await createBooking(bookingData);
             console.log("[SeatBooking] Booking created:", response);
 
-            // Prepare details for the modal
-            setBookingDetailsForModal({
-                _id: response.bookingId, // Add the booking ID
+            // Navigate to checkout page with booking info
+            navigate('/checkout', { state: { booking: {
+                _id: response.bookingId,
+                subtotalAmount: totalAmount,
+                discountAmount: 0,
+                totalAmount: totalAmount,
                 movieTitle: details.movie?.title,
-                showtimeTime: details.showtime?.start_time,
                 theaterName: details.theater?.name,
                 screenNumber: details.screen?.screen_number,
-                seatCount: selectedSeatIds.length,
                 seatLabels: getSelectedSeatLabels(),
-                totalAmount: totalAmount,
+                showtimeTime: details.showtime?.start_time,
                 userName: user?.name,
                 userEmail: user?.email
-            });
-            setIsConfirmationModalOpen(true);
+            } } });
         } catch (error) {
             console.error("[SeatBooking] Booking creation failed:", error.response?.data || error);
             let friendlyErrorMessage = 'Booking failed. Please try again.';
@@ -158,17 +159,7 @@ const SeatBooking = () => {
         }
     };
 
-    // Close modal
-    const closeConfirmationModal = () => {
-        setIsConfirmationModalOpen(false);
-        setBookingDetailsForModal(null);
-    };
-
-    // Handle successful payment
-    const handlePaymentSuccess = () => {
-        setIsConfirmationModalOpen(false);
-        navigate('/bookings');
-    };
+    // Payment handled in Checkout
 
     // --- Render Logic ---
     if (isLoading) {
@@ -243,16 +234,7 @@ const SeatBooking = () => {
                 </div>
             </div>
 
-            {/* Confirmation Modal */}
-             {/* This conditional rendering accessing bookingDetailsForModal IS CORRECT */}
-            {isConfirmationModalOpen && bookingDetailsForModal && (
-                 <BookingConfirmationModal
-                     isOpen={isConfirmationModalOpen}
-                     onClose={closeConfirmationModal}
-                     bookingDetails={bookingDetailsForModal} // Passing the state variable
-                     onConfirmBooking={handlePaymentSuccess}
-                 />
-             )}
+            {/* Modal removed; flow continues in Checkout page */}
         </div>
     );
 };

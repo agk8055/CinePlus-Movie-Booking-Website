@@ -78,6 +78,19 @@ const AdminPanel = () => {
                             </section>
                         )}
 
+                        {/* Offers Management - Admin only */}
+                        {isAdmin && (
+                            <section className="admin-card">
+                                <Link to="/admin/offers" className="card-link full-link">
+                                    <span className="link-icon">💸</span>
+                                    <div className="link-content">
+                                        <h3>Offers & Promo Codes</h3>
+                                        <p>Create and manage discounts</p>
+                                    </div>
+                                </Link>
+                            </section>
+                        )}
+
                         {/* Theater Management */}
                         <section className="admin-card">
                             <Link to="/admin/theaters" className="card-link full-link">

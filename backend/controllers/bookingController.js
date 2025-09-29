@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Showtime = require('../models/Showtime');
 const Seat = require('../models/Seat');
+const { evaluateBestOffer } = require('../utils/offerEngine');
 const Payment = require('../models/Payment'); // Keep if used elsewhere
 const User = require('../models/User');       // For user email/name
 const Movie = require('../models/Movie');     // For movie title
@@ -137,15 +138,19 @@ exports.createBooking = async function(req, res, next) {
         });
         const seatNumbersString = bookedSeatDetails.map(s => s.seat_number).join(', ');
 
-        const newBookingArr = await Booking.create([{
+        const bookingDoc = {
             user_id: userId,
             showtime_id: showtimeId,
             booked_seats: bookedSeatDetails,
+            subtotal_amount: totalAmount,
+            discount_amount: 0,
             total_amount: totalAmount,
             booking_date: new Date(),
-            status: 'active',
-            payment_status: 'paid'
-        }], { session });
+            status: 'pending',
+            payment_status: 'pending'
+        };
+
+        const newBookingArr = await Booking.create([bookingDoc], { session });
 
         savedBooking = newBookingArr[0];
         console.log(`Booking document created: ${savedBooking._id}, Status: ${savedBooking.status}`);
@@ -157,6 +162,9 @@ exports.createBooking = async function(req, res, next) {
             message: 'Booking created successfully!',
             bookingId: savedBooking._id,
             totalAmount: savedBooking.total_amount,
+            subtotalAmount: savedBooking.subtotal_amount,
+            discountAmount: savedBooking.discount_amount,
+            appliedOffer: savedBooking.applied_offer,
             bookedSeats: savedBooking.booked_seats,
         });
 
