@@ -19,6 +19,7 @@
     "@mui/icons-material": "^6.4.2",
     "@mui/material": "^6.4.2",
     "axios": "^1.8.4",
+    "fast-average-color": "^9.5.0",
     "html5-qrcode": "^2.3.8",
     "moment-timezone": "^0.5.48",
     "react": "^18.3.1",

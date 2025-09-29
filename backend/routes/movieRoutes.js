@@ -35,9 +35,9 @@ const validateMovie = [
         if (!errors.isEmpty()) {
             // Return validation errors
             return res.status(400).json({
-                 message: errors.array()[0].msg, // Send first error message
-                 errors: errors.array() // Send all errors
-                });
+                message: errors.array()[0].msg, // Send first error message
+                errors: errors.array() // Send all errors
+            });
         }
         next(); // Proceed to controller if validation passes
     }
@@ -63,6 +63,10 @@ router.get('/upcoming', movieController.getUpcomingMovies);
 
 // GET movies by search query
 router.get('/search', movieController.searchMovies); // Should come before /:id
+
+// **NEW ROUTE ADDED HERE**
+// GET booking stats for a specific movie
+router.get('/:id/booking-stats', movieController.getBookingStatsForMovie);
 
 // GET a single movie by ID
 router.get('/:id', movieController.getMovieById);

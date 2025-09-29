@@ -35,7 +35,7 @@ exports.getMovieById = async (req, res, next) => {
 
         // Validate ID format
         if (!mongoose.Types.ObjectId.isValid(id)) {
-             return res.status(400).json({ message: 'Invalid movie ID format' });
+            return res.status(400).json({ message: 'Invalid movie ID format' });
         }
 
         // Fetch movie details
@@ -48,9 +48,9 @@ exports.getMovieById = async (req, res, next) => {
         // Fetch showtimes for the movie from the start of the current day onwards
         const todayStart = getStartOfToday();
         const showtimes = await Showtime.find({
-                movie_id: id,
-                start_time: { $gte: todayStart } // Use $gte (greater than or equal to)
-            })
+            movie_id: id,
+            start_time: { $gte: todayStart } // Use $gte (greater than or equal to)
+        })
             .select('start_time theater_id screen_id language') // Select only necessary fields
             .populate('theater_id', 'name city') // Populate theater name/city
             .populate('screen_id', 'screen_number') // Populate screen number
@@ -79,7 +79,7 @@ exports.searchMovies = async (req, res, next) => {
 
         // Find movies matching the title, select only necessary fields
         const movies = await Movie.find({ title: { $regex: searchRegex } })
-                                  .select('_id title poster_url'); // Select fields for search results
+            .select('_id title poster_url'); // Select fields for search results
 
         res.status(200).json(movies);
     } catch (error) {
@@ -105,14 +105,14 @@ exports.createMovie = async (req, res, next) => { // Ensure next is passed
 
         // Handle specific MongoServerError codes
         if (error instanceof mongoose.mongo.MongoServerError) {
-             if (error.code === 17261 || error.code === 17262) { // Handle both language override errors
-                 // Provide a generic message as the field is now 'languages'
-                 return res.status(400).json({ message: `Invalid data format/type for languages field: ${error.errorResponse?.errmsg || 'Check data.'}` }); // Added return
-             }
-             if (error.code === 11000) { // Duplicate key
+            if (error.code === 17261 || error.code === 17262) { // Handle both language override errors
+                // Provide a generic message as the field is now 'languages'
+                return res.status(400).json({ message: `Invalid data format/type for languages field: ${error.errorResponse?.errmsg || 'Check data.'}` }); // Added return
+            }
+            if (error.code === 11000) { // Duplicate key
                 const field = Object.keys(error.keyValue)[0];
                 return res.status(409).json({ message: `Duplicate field value entered for '${field}'. Please use another value.` }); // Added return
-             }
+            }
         }
 
         // If none of the specific errors matched, pass to global handler
@@ -126,7 +126,7 @@ exports.updateMovie = async (req, res, next) => {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-             return res.status(400).json({ message: 'Invalid movie ID format' });
+            return res.status(400).json({ message: 'Invalid movie ID format' });
         }
 
         // Find by ID and update with request body, run validators, return updated doc
@@ -143,13 +143,13 @@ exports.updateMovie = async (req, res, next) => {
         res.status(200).json({ message: 'Movie updated successfully', movie: updatedMovie });
     } catch (error) {
         console.error('Error updating movie:', error);
-         if (error.name === 'ValidationError') {
-             const messages = Object.values(error.errors).map(val => val.message);
-             return res.status(400).json({ message: messages.join('. ') });
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map(val => val.message);
+            return res.status(400).json({ message: messages.join('. ') });
         }
         // Handle potential duplicate key errors if updating a field with a unique index
         if (error.code === 11000) {
-             return res.status(400).json({ message: 'Update failed due to duplicate key constraint.' });
+            return res.status(400).json({ message: 'Update failed due to duplicate key constraint.' });
         }
         next(error);
     }
@@ -239,9 +239,9 @@ exports.getComingSoonMoviesPage = async (req, res, next) => {
 
         // 2. Find movies that are NOT in the list above AND have a release date in the future
         const comingSoonMovies = await Movie.find({
-                _id: { $nin: movieIdsWithShowtimes }, // $nin: not in the array
-                release_date: { $gt: today }         // $gt: greater than today
-            })
+            _id: { $nin: movieIdsWithShowtimes }, // $nin: not in the array
+            release_date: { $gt: today }          // $gt: greater than today
+        })
             .sort({ release_date: -1 }); // Order by release date descending
 
         res.status(200).json(comingSoonMovies);
@@ -351,7 +351,7 @@ exports.getPopularMovies = async (req, res, next) => {
             {
                 $sort: { show_count: -1 }
             },
-             // 4. Limit to top 5
+            // 4. Limit to top 5
             {
                 $limit: 5
             },
@@ -390,7 +390,6 @@ exports.getPopularMovies = async (req, res, next) => {
 };
 
 // --- Get Upcoming Movies (No shows, release date > today, limit 5) ---
-// --- Get Upcoming Movies (Movies without showtimes, ordered by release date, limit 5) ---
 exports.getUpcomingMovies = async (req, res, next) => {
     try {
         const today = new Date(); // Get current date/time for comparison
@@ -402,12 +401,11 @@ exports.getUpcomingMovies = async (req, res, next) => {
         //    - Their _id is NOT IN the array of IDs found above ($nin operator)
         //    - Their release_date is strictly GREATER THAN today ($gt operator)
         const upcomingMovies = await Movie.find({
-                _id: { $nin: movieIdsWithShowtimes }, // Find movies whose _id is NOT IN the array
-                release_date: { $gt: today }         // Find movies with release_date after today
-            })
+            _id: { $nin: movieIdsWithShowtimes }, // Find movies whose _id is NOT IN the array
+            release_date: { $gt: today }          // Find movies with release_date after today
+        })
             .sort({ release_date: 1 }) // Sort by release_date ASCENDING (earliest first)
-            .limit(5)                  // Limit the results to 5
-            // *** CHANGE HERE: Add 'genre' to the select string ***
+            .limit(5)                   // Limit the results to 5
             .select('_id title poster_url release_date genre'); // Select needed fields including genre
 
         // 3. Send the results
@@ -419,5 +417,52 @@ exports.getUpcomingMovies = async (req, res, next) => {
     }
 };
 
-// Note: module.exports = exports; is not needed if you define functions as exports.functionName
-// module.exports = exports;
+// --- **UPDATED** Get Booking Stats for a Movie ---
+exports.getBookingStatsForMovie = async (req, res, next) => {
+    try {
+        const { id: movieId } = req.params;
+        const { timeframe } = req.query; // Expect '1h' or '24h'
+
+        if (!mongoose.Types.ObjectId.isValid(movieId)) {
+            return res.status(400).json({ message: 'Invalid movie ID format' });
+        }
+        
+        // Determine the start date for the query based on the timeframe
+        let startDate;
+        if (timeframe === '1h') {
+            startDate = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
+        } else {
+            startDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // Default to 24 hours ago
+        }
+
+        const showtimes = await Showtime.find({ movie_id: movieId }).select('_id').lean();
+        const showtimeIds = showtimes.map(st => st._id);
+
+        if (showtimeIds.length === 0) {
+            return res.status(200).json({ ticketCount: 0 });
+        }
+
+        const stats = await Booking.aggregate([
+            {
+                $match: {
+                    showtime_id: { $in: showtimeIds },
+                    status: 'active',
+                    booking_date: { $gte: startDate } // Use the dynamic start date
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalTickets: { $sum: { $size: "$booked_seats" } }
+                }
+            }
+        ]);
+
+        const ticketCount = stats.length > 0 ? stats[0].totalTickets : 0;
+        res.status(200).json({ ticketCount });
+
+    } catch (error) {
+        console.error('Error fetching booking stats for movie:', error);
+        next(error);
+    }
+};
