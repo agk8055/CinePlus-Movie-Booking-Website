@@ -180,6 +180,32 @@ export const searchMovies = async (query) => {
     return response.data;
 };
 
+// --- Reviews ---
+export const addOrUpdateMyReview = async (movieId, { rating, comment }) => {
+    const response = await api.post(`/movies/${movieId}/reviews`, { rating, comment });
+    return response.data;
+};
+
+export const updateReviewById = async (movieId, reviewId, { rating, comment }) => {
+    const response = await api.put(`/movies/${movieId}/reviews/${reviewId}`, { rating, comment });
+    return response.data;
+};
+
+export const getReviewsByMovie = async (movieId, { page = 1, limit = 10 } = {}) => {
+    const response = await api.get(`/movies/${movieId}/reviews`, { params: { page, limit } });
+    return response.data; // { items, page, limit, total, hasMore }
+};
+
+export const getMyReview = async (movieId) => {
+    const response = await api.get(`/movies/${movieId}/reviews/me`);
+    return response.data; // { review }
+};
+
+export const deleteMyReview = async (movieId) => {
+    const response = await api.delete(`/movies/${movieId}/reviews/me`);
+    return response.data;
+};
+
 // --- Movie CRUD (Admin) ---
 export const createMovie = async (movieData) => {
     const response = await api.post('/movies', movieData);

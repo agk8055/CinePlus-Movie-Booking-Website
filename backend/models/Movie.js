@@ -63,6 +63,17 @@ const movieSchema = new mongoose.Schema({
         // Optional: Add regex validation for basic URL format
         // match: [/^(https?:\/\/[^\s$.?#].[^\s]*)$/, 'Please fill a valid Trailer URL']
     },
+    // --- Ratings & Reviews ---
+    avgRatingPoints: {
+        type: Number,
+        default: 0,
+        min: [0, 'Average rating cannot be negative']
+    },
+    reviewCount: {
+        type: Number,
+        default: 0,
+        min: [0, 'Review count cannot be negative']
+    },
 }, {
     timestamps: true, // Adds createdAt and updatedAt automatically
 });
