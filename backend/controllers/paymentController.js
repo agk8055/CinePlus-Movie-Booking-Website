@@ -127,6 +127,65 @@ const verifyPayment = async (req, res) => {
         await booking.save();
         console.log('Booking updated successfully');
 
+        // Send confirmation email after successful payment
+        try {
+            const User = require('../models/User');
+            const Showtime = require('../models/Showtime');
+            const Screen = require('../models/Screen');
+            const Theater = require('../models/Theater');
+            const sendEmail = require('../utils/emailService');
+
+            const populatedBooking = await Booking.findById(bookingId)
+                .populate({
+                    path: 'showtime_id',
+                    select: 'start_time screen_id movie_id',
+                    populate: [
+                        { path: 'movie_id', select: 'title' },
+                        { path: 'screen_id', select: 'screen_number theater_id', populate: { path: 'theater_id', select: 'name city' } }
+                    ]
+                })
+                .lean();
+
+            const user = await User.findById(populatedBooking.user_id).select('name email').lean();
+            if (user && user.email) {
+                const movie = populatedBooking.showtime_id?.movie_id;
+                const screen = populatedBooking.showtime_id?.screen_id;
+                const theater = screen?.theater_id;
+                const seatNumbersString = (populatedBooking.booked_seats || []).map(s => s.seat_number).join(', ');
+
+                const emailHtml = `
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                        <h1 style="color: #4a4a4a;">Cineplus Booking Confirmation</h1>
+                        <p>Hi ${user.name || 'Valued Customer'},</p>
+                        <p>Thank you! Your payment was successful. Here are your booking details:</p>
+                        <div style="border: 1px solid #eee; padding: 15px; margin-top: 10px; background-color: #f9f9f9;">
+                            <h2 style="margin-top: 0; color: #555;">Booking Summary</h2>
+                            <p><strong>Booking ID:</strong> ${populatedBooking._id}</p>
+                            <p><strong>Movie:</strong> ${movie?.title || 'N/A'}</p>
+                            <p><strong>Theater:</strong> ${theater?.name || 'N/A'} ${theater?.city ? `(${theater.city})` : ''}</p>
+                            <p><strong>Screen:</strong> ${screen?.screen_number || 'N/A'}</p>
+                            <p><strong>Date & Time:</strong> ${new Date(populatedBooking.showtime_id?.start_time).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', hour12: true })}</p>
+                            <p><strong>Seats:</strong> ${seatNumbersString}</p>
+                            <p><strong>Total Paid:</strong> ₹${(populatedBooking.total_amount || 0).toFixed(2)}</p>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                        <p>Please show this email or your booking details in the Cineplus app at the theater entrance.</p>
+                        <p>Enjoy your movie!</p>
+                        <p>— The Cineplus Team</p>
+                    </div>
+                `;
+
+                await sendEmail({
+                    email: user.email,
+                    subject: `✅ Payment Successful — Your Cineplus Tickets for ${movie?.title || 'the show'}`,
+                    html: emailHtml,
+                    message: `Your payment was successful. Booking ID: ${populatedBooking._id}`
+                });
+            }
+        } catch (emailErr) {
+            console.error('Failed to send confirmation email after payment:', emailErr);
+        }
+
         res.status(200).json({
             success: true,
             message: 'Payment verified successfully',

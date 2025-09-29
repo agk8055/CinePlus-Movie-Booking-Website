@@ -2,7 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import api from '../api/api';
-import './Checkout.css'; // Import the new CSS file
+import './Checkout.css';
+
+// Icon Components
+const MovieIcon = () => <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>;
+const TheaterIcon = () => <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg>;
+const ScreenIcon = () => <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>;
+const SeatIcon = () => <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18v3h3v-3h10v3h3v-6H4v3zm15-8h3v3h-3v-3zM2 10h3v3H2v-3zm15 3H7V5c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v8z"/></svg>;
+const ClockIcon = () => <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>;
+const TicketIcon = () => <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M22 10V6c0-1.11-.9-2-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-9 7.5h-2v-2h2v2zm0-4.5h-2v-2h2v2zm0-4.5h-2v-2h2v2z"/></svg>;
+const SecurityIcon = () => <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>;
+const GiftIcon = () => <svg className="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>;
 
 const Checkout = () => {
     const navigate = useNavigate();
@@ -14,7 +24,7 @@ const Checkout = () => {
     const [pricing, setPricing] = useState({ subtotal: 0, discount: 0, finalTotal: 0, applied: null });
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState('');
-    const [isPromoVisible, setIsPromoVisible] = useState(false); // State for promo input visibility
+    const [isPromoVisible, setIsPromoVisible] = useState(false);
 
     useEffect(() => {
         if (!booking) {
@@ -96,7 +106,7 @@ const Checkout = () => {
                     prefill: {
                         // You can prefill user details here if available
                     },
-                    theme: { color: '#75d402' } // Updated theme color
+                    theme: { color: '#75d402' }
                 };
                 const razorpay = new window.Razorpay(options);
                 razorpay.open();
@@ -120,59 +130,148 @@ const Checkout = () => {
     if (!booking) return null;
 
     return (
-        <div className="checkout-page">
-            <h2>Checkout Summary</h2>
-            {error && <div className="error-message">{error}</div>}
-            
-            <div className="summary">
-                {booking?.movieTitle && <div className="summary-item"><span className="icon">🎬</span><span>Movie</span><span>{booking.movieTitle}</span></div>}
-                {booking?.theaterName && <div className="summary-item"><span className="icon">🎭</span><span>Theater</span><span>{booking.theaterName}</span></div>}
-                {booking?.screenNumber && <div className="summary-item"><span className="icon">💻</span><span>Screen</span><span>{booking.screenNumber}</span></div>}
-                {booking?.seatLabels && <div className="summary-item"><span className="icon">💺</span><span>Seats</span><span>{booking.seatLabels}</span></div>}
-                {booking?.showtimeTime && <div className="summary-item"><span className="icon">⏰</span><span>Showtime</span><span>{formatShowtime(booking.showtimeTime)}</span></div>}
-                
-                <div className="summary-item">
-                    <span>Subtotal</span>
-                    <span>₹{pricing.subtotal.toFixed(2)}</span>
-                </div>
-                
-                {pricing.discount > 0 && (
-                    <div className="summary-item discount">
-                        <span>Discount {pricing.applied?.title ? `(${pricing.applied.title})` : ''}</span>
-                        <span>-₹{pricing.discount.toFixed(2)}</span>
+        <div className="checkout-container">
+            <div className="checkout-card">
+                <div className="checkout-header">
+                    <div className="header-icon">
+                        <TicketIcon />
                     </div>
-                )}
-
-                <div className="summary-total">
-                    <span>Total Payable</span>
-                    <span>₹{pricing.finalTotal.toFixed(2)}</span>
+                    <h1>Checkout Summary</h1>
+                    <p className="header-subtitle">Complete your booking experience</p>
                 </div>
-            </div>
 
-            {!isPromoVisible ? (
-                <button className="promo-toggle" onClick={() => setIsPromoVisible(true)}>
-                    Enter Promo Code
-                </button>
-            ) : (
-                <div className="promo">
-                    <input 
-                        placeholder="Enter Promo Code" 
-                        value={promoCode} 
-                        onChange={(e) => setPromoCode(e.target.value)} 
-                    />
-                    <button onClick={applyOffer}>Apply</button>
+                {error && <div className="error-message">{error}</div>}
+                
+                <div className="booking-details">
+                    <h3>Booking Information</h3>
+                    <div className="details-grid">
+                        {booking?.movieTitle && (
+                            <div className="detail-item">
+                                <div className="detail-icon">
+                                    <MovieIcon />
+                                </div>
+                                <div className="detail-content">
+                                    <span className="detail-label">Movie</span>
+                                    <span className="detail-value">{booking.movieTitle}</span>
+                                </div>
+                            </div>
+                        )}
+                        {booking?.theaterName && (
+                            <div className="detail-item">
+                                <div className="detail-icon">
+                                    <TheaterIcon />
+                                </div>
+                                <div className="detail-content">
+                                    <span className="detail-label">Theater</span>
+                                    <span className="detail-value">{booking.theaterName}</span>
+                                </div>
+                            </div>
+                        )}
+                        {booking?.screenNumber && (
+                            <div className="detail-item">
+                                <div className="detail-icon">
+                                    <ScreenIcon />
+                                </div>
+                                <div className="detail-content">
+                                    <span className="detail-label">Screen</span>
+                                    <span className="detail-value">{booking.screenNumber}</span>
+                                </div>
+                            </div>
+                        )}
+                        {booking?.seatLabels && (
+                            <div className="detail-item">
+                                <div className="detail-icon">
+                                    <SeatIcon />
+                                </div>
+                                <div className="detail-content">
+                                    <span className="detail-label">Seats</span>
+                                    <span className="detail-value seats">{booking.seatLabels}</span>
+                                </div>
+                            </div>
+                        )}
+                        {booking?.showtimeTime && (
+                            <div className="detail-item">
+                                <div className="detail-icon">
+                                    <ClockIcon />
+                                </div>
+                                <div className="detail-content">
+                                    <span className="detail-label">Showtime</span>
+                                    <span className="detail-value">{formatShowtime(booking.showtimeTime)}</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
 
-            <div className="actions">
-                <button onClick={proceedToPayment} disabled={isProcessing}>
-                    {isProcessing ? 'Processing...' : `Pay ₹${pricing.finalTotal.toFixed(2)}`}
-                </button>
+                <div className="pricing-section">
+                    <h3>Payment Summary</h3>
+                    <div className="price-breakdown">
+                        <div className="price-item">
+                            <span>Subtotal</span>
+                            <span>₹{pricing.subtotal.toFixed(2)}</span>
+                        </div>
+                        
+                        {pricing.discount > 0 && (
+                            <div className="price-item discount">
+                                <span>Discount {pricing.applied?.title ? `(${pricing.applied.title})` : ''}</span>
+                                <span>-₹{pricing.discount.toFixed(2)}</span>
+                            </div>
+                        )}
+
+                        <div className="price-total">
+                            <span>Total Payable</span>
+                            <span>₹{pricing.finalTotal.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="promo-section">
+                    {!isPromoVisible ? (
+                        <button className="promo-toggle" onClick={() => setIsPromoVisible(true)}>
+                            <GiftIcon />
+                            <span>Add Promo Code</span>
+                        </button>
+                    ) : (
+                        <div className="promo-input-group">
+                            <div className="input-wrapper">
+                                <input 
+                                    placeholder="Enter your promo code" 
+                                    value={promoCode} 
+                                    onChange={(e) => setPromoCode(e.target.value)}
+                                    className="promo-input"
+                                />
+                                <span className="input-icon">
+                                    <TicketIcon />
+                                </span>
+                            </div>
+                            <button onClick={applyOffer} className="promo-apply">Apply</button>
+                        </div>
+                    )}
+                </div>
+
+                <div className="payment-actions">
+                    <button 
+                        onClick={proceedToPayment} 
+                        disabled={isProcessing}
+                        className="payment-button"
+                    >
+                        {isProcessing ? (
+                            <div className="loading-spinner">
+                                <div className="spinner"></div>
+                                Processing...
+                            </div>
+                        ) : (
+                            `Pay ₹${pricing.finalTotal.toFixed(2)}`
+                        )}
+                    </button>
+                    <p className="secure-payment">
+                        <SecurityIcon />
+                        Your payment is secure and encrypted
+                    </p>
+                </div>
             </div>
         </div>
     );
 };
 
 export default Checkout;
-
-

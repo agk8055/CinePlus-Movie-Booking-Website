@@ -59,8 +59,8 @@ exports.deleteOffer = async (req, res) => {
 // Body: { numTickets, subtotal, promoCode }
 exports.evaluate = async (req, res) => {
     try {
-        const { numTickets, subtotal, promoCode } = req.body;
-        const result = await evaluateBestOffer({ numTickets, subtotal }, promoCode);
+        const { numTickets, subtotal, promoCode, movieId, isFirstBooking } = req.body;
+        const result = await evaluateBestOffer({ numTickets, subtotal, movieId, isFirstBooking }, promoCode);
         res.json({ success: true, data: result });
     } catch (err) {
         res.status(400).json({ success: false, message: err.message });
@@ -72,12 +72,18 @@ exports.evaluate = async (req, res) => {
 exports.applyToBooking = async (req, res) => {
     try {
         const { bookingId, promoCode } = req.body;
-        const booking = await Booking.findById(bookingId);
+        const booking = await Booking.findById(bookingId).populate({
+            path: 'showtime_id',
+            select: 'movie_id',
+            populate: { path: 'movie_id', select: '_id' }
+        });
         if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
 
         const numTickets = booking.booked_seats?.length || 0;
         const subtotal = booking.subtotal_amount ?? booking.total_amount;
-        const result = await evaluateBestOffer({ numTickets, subtotal }, promoCode);
+        const movieId = booking.showtime_id?.movie_id?._id || booking.showtime_id?.movie_id || undefined;
+        const isFirstBooking = false; // placeholder; derive via user history if needed in future
+        const result = await evaluateBestOffer({ numTickets, subtotal, movieId, isFirstBooking }, promoCode);
 
         booking.discount_amount = result.discount || 0;
         booking.total_amount = result.finalTotal ?? subtotal;

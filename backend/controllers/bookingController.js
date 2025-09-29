@@ -167,52 +167,7 @@ exports.createBooking = async function(req, res, next) {
             appliedOffer: savedBooking.applied_offer,
             bookedSeats: savedBooking.booked_seats,
         });
-
-        (async () => { // Email Sending IIAFE
-            try {
-                const user = await User.findById(userId).select('name email').lean();
-                if (!user || !user.email) {
-                    console.error(`CRITICAL: User ${userId} or email not found after successful booking ${savedBooking._id}. Cannot send confirmation email.`);
-                    return;
-                }
-
-                console.log(`Preparing confirmation email for booking ${savedBooking._id} to user ${user.email}`);
-
-                const emailHtml = `
-                    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                        <h1 style="color: #4a4a4a;">Cineplus Booking Confirmation</h1>
-                        <p>Hi ${user.name || 'Valued Customer'},</p>
-                        <p>Thank you for choosing Cineplus! Your booking is confirmed. Please find the details below:</p>
-                        <div style="border: 1px solid #eee; padding: 15px; margin-top: 10px; background-color: #f9f9f9;">
-                            <h2 style="margin-top: 0; color: #555;">Booking Summary</h2>
-                            <p><strong>Booking ID:</strong> ${savedBooking._id}</p>
-                            <p><strong>Movie:</strong> ${movie.title}</p>
-                            <p><strong>Theater:</strong> ${theater.name} (${theater.city})</p>
-                            <p><strong>Screen:</strong> ${screen.screen_number}</p>
-                            <p><strong>Date & Time:</strong> ${new Date(showtime.start_time).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', hour12: true })}</p>
-                            <p><strong>Seats:</strong> ${seatNumbersString} (${bookedSeatDetails.length} seat${bookedSeatDetails.length > 1 ? 's' : ''})</p>
-                            <p><strong>Total Amount:</strong> ₹${totalAmount.toFixed(2)}</p>
-                            <p><strong>Status:</strong> ${savedBooking.status} (${savedBooking.payment_status})</p>
-                        </div>
-                        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                        <p>Please show this confirmation email or your booking details in the Cineplus app at the theater entrance.</p>
-                        <p>We look forward to seeing you!</p>
-                        <p>Warm regards,<br/><strong>The Cineplus Team</strong></p>
-                    </div>
-                `;
-                const emailText = `... (text version as before) ...`; // Keep text version for brevity
-
-                await sendEmail({
-                    email: user.email,
-                    subject: `✅ Your Cineplus Ticket: ${movie.title}`,
-                    html: emailHtml,
-                    message: emailText
-                });
-
-            } catch (emailError) {
-                console.error(`ALERT: Booking ${savedBooking?._id} created successfully, but failed to send confirmation email to ${userId}. Error: ${emailError.message}`, emailError);
-            }
-        })(); // End of IIAFE for email sending
+        // Do not send confirmation email here; it will be sent after successful payment verification
 
     } catch (error) {
         console.error('Error during booking creation transaction:', error);

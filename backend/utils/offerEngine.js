@@ -19,10 +19,10 @@ function isWithinValidity(offer) {
 }
 
 // Evaluate all active conditional offers and an optional promo code.
-// cart = { numTickets: number, subtotal: number }
+// cart = { numTickets: number, subtotal: number, movieId?: string, isFirstBooking?: boolean }
 // promoCode = optional string
 async function evaluateBestOffer(cart, promoCode) {
-    const { numTickets, subtotal } = cart || {};
+    const { numTickets, subtotal, movieId, isFirstBooking } = cart || {};
     if (!Number.isFinite(subtotal) || subtotal <= 0) {
         return { applied: null, discount: 0, finalTotal: 0 };
     }
@@ -34,6 +34,13 @@ async function evaluateBestOffer(cart, promoCode) {
     for (const offer of activeOffers) {
         if (!isWithinValidity(offer)) continue;
 
+        // Scope filtering
+        if (offer.scope === 'movie') {
+            if (!movieId) continue; // cannot apply movie-scoped offer without a movie context
+            if (offer.movie_id?.toString() !== String(movieId)) continue;
+        }
+        if (offer.scope === 'first_time' && !isFirstBooking) continue;
+
         if (offer.type === 'conditional') {
             const minTickets = Number(offer?.condition?.minTickets || 0);
             if (minTickets > 0 && numTickets >= minTickets) {
@@ -44,7 +51,9 @@ async function evaluateBestOffer(cart, promoCode) {
             }
         } else if (offer.type === 'promocode') {
             const code = String(offer?.condition?.code || '').trim().toUpperCase();
+            const minTicketsPromo = Number(offer?.condition?.minTickets || 0);
             if (promoCode && code && promoCode.trim().toUpperCase() === code) {
+                if (minTicketsPromo > 0 && !(numTickets >= minTicketsPromo)) continue;
                 const discount = computeDiscountAmount(subtotal, offer.discountType, offer.discountValue);
                 if (discount > 0) {
                     candidates.push({ offer, discount });
