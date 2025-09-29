@@ -482,3 +482,25 @@ exports.verifyTicket = async function(req, res, next) {
         next(error);
     }
 };
+
+// --- Auto-cancel stale pending bookings (no payment within 15 minutes) ---
+exports.cancelStalePendingBookings = async function() {
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    try {
+        const result = await Booking.updateMany(
+            {
+                payment_status: 'pending',
+                status: 'pending',
+                createdAt: { $lte: fifteenMinutesAgo }
+            },
+            {
+                $set: { payment_status: 'failed', status: 'cancelled' }
+            }
+        );
+        console.log(`[Cron] Auto-cancelled stale bookings >15m: matched=${result.matchedCount ?? result.n}, modified=${result.modifiedCount ?? result.nModified}`);
+        return { success: true, matched: result.matchedCount ?? result.n, modified: result.modifiedCount ?? result.nModified };
+    } catch (err) {
+        console.error('[Cron] Error auto-cancelling stale bookings:', err);
+        return { success: false, error: err.message };
+    }
+};

@@ -24,10 +24,11 @@ exports.getSeatLayout = async (req, res, next) => {
         // Get all seats for the screen
         const seats = await Seat.find({ screen_id: screenId }).lean();
         
-        // Get booked seats for this showtime (only from bookings with payment_status 'paid')
+        // Get booked seats for this showtime
+        // Treat both 'paid' and 'pending' bookings as holding seats
         const bookings = await Booking.find({ 
             showtime_id: showtimeId,
-            payment_status: 'paid'  // Only consider bookings with payment_status 'paid'
+            payment_status: { $in: ['paid', 'pending'] }
         }).select('booked_seats.seat_id').lean();
 
         // Extract all booked seat IDs from the bookings

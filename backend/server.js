@@ -18,6 +18,7 @@ const path = require('path');
 const connectDB = require('./config/db'); // Import the Mongoose connection function
 const apiRoutes = require('./routes/index'); // Import the main router
 const showtimeController = require('./controllers/showtimeController'); // For the scheduled task
+const bookingController = require('./controllers/bookingController');
 
 // --- Configure Winston Logger ---
 const logger = winston.createLogger({
@@ -261,6 +262,18 @@ server = app.listen(PORT, () => {
             logger.info(`[Scheduler] Job finished. Success: ${result.success}, Updated: ${result.updated ?? 'N/A'}`);
         } catch (error) {
             logger.error('[Scheduler] Error running scheduled job updateShowtimeStatusesToCompleted:', error);
+        }
+    });
+
+    // 1b. Auto-cancel stale pending bookings (>15m)
+    logger.info('[Scheduler] Setting up cron job to cancel stale pending bookings...');
+    cron.schedule('*/5 * * * *', async () => {
+        logger.info('[Scheduler] Triggering cancelStalePendingBookings job...');
+        try {
+            const result = await bookingController.cancelStalePendingBookings();
+            logger.info(`[Scheduler] Stale bookings cleanup finished. Success: ${result.success}, Modified: ${result.modified ?? 'N/A'}`);
+        } catch (error) {
+            logger.error('[Scheduler] Error running cancelStalePendingBookings:', error);
         }
     });
 

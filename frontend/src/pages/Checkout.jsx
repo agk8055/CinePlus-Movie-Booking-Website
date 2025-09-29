@@ -101,14 +101,27 @@ const Checkout = () => {
                             navigate('/bookings');
                         } catch (error) {
                             setError('Payment verification failed. Please contact support.');
+                            // Mark payment failed to release seats
+                            try { await api.post('/payments/payment-failed', { bookingId: booking._id, reason: 'verification_failed' }); } catch {}
                         }
                     },
                     prefill: {
                         // You can prefill user details here if available
                     },
-                    theme: { color: '#75d402' }
+                    theme: { color: '#75d402' },
+                    modal: {
+                        ondismiss: async () => {
+                            // User closed the modal without paying; release seats
+                            try { await api.post('/payments/payment-failed', { bookingId: booking._id, reason: 'user_dismissed' }); } catch {}
+                        }
+                    }
                 };
                 const razorpay = new window.Razorpay(options);
+                // Catch explicit payment failed event
+                razorpay.on('payment.failed', async (response) => {
+                    setError(response.error?.description || 'Payment failed. Please try again.');
+                    try { await api.post('/payments/payment-failed', { bookingId: booking._id, reason: 'payment_failed' }); } catch {}
+                });
                 razorpay.open();
                 setIsProcessing(false);
             };

@@ -202,7 +202,32 @@ const verifyPayment = async (req, res) => {
     }
 };
 
+// Mark payment failed and release seats by moving booking out of pending
+const markPaymentFailed = async (req, res) => {
+    try {
+        const { bookingId, reason } = req.body;
+        if (!bookingId) {
+            return res.status(400).json({ success: false, message: 'bookingId is required' });
+        }
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(404).json({ success: false, message: 'Booking not found' });
+        }
+        // Only update if still pending
+        if (booking.payment_status === 'pending') {
+            booking.payment_status = 'failed';
+            booking.status = 'cancelled';
+            await booking.save();
+        }
+        return res.status(200).json({ success: true, booking });
+    } catch (error) {
+        console.error('Error marking payment failed:', error);
+        return res.status(500).json({ success: false, message: 'Failed to mark payment as failed' });
+    }
+};
+
 module.exports = {
     createOrder,
-    verifyPayment
+    verifyPayment,
+    markPaymentFailed
 }; 
