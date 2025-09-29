@@ -2,6 +2,8 @@
 const mongoose = require('mongoose');
 const Review = require('../models/Review');
 const Movie = require('../models/Movie');
+const Booking = require('../models/Booking');
+const Showtime = require('../models/Showtime');
 
 // Helper to recalc average from all reviews for a movie
 async function recalcAverageForMovie(movieId) {
@@ -31,6 +33,16 @@ exports.addReview = async (req, res, next) => {
         const movie = await Movie.findById(movieId).select('avgRatingPoints reviewCount');
         if (!movie) {
             return res.status(404).json({ message: 'Movie not found' });
+        }
+
+        // Eligibility: user must have an active/accepted booking for a showtime of this movie whose start_time is in the past
+        const showtime = await Showtime.findOne({ movie_id: movieId, start_time: { $lte: new Date() } }).select('_id start_time').lean();
+        if (!showtime) {
+            return res.status(403).json({ message: 'You can review only after attending the show.' });
+        }
+        const hasBooking = await Booking.exists({ user_id: req.user.userId, showtime_id: showtime._id, status: { $in: ['active', 'accepted'] } });
+        if (!hasBooking) {
+            return res.status(403).json({ message: 'Only users who booked this show can review.' });
         }
 
         // Create or update (upsert) user's review for this movie
@@ -78,6 +90,16 @@ exports.updateReview = async (req, res, next) => {
         if (!mongoose.Types.ObjectId.isValid(movieId) || !mongoose.Types.ObjectId.isValid(reviewId)) {
             return res.status(400).json({ message: 'Invalid ID format' });
         }
+        // Eligibility check also for update by id
+        const showtime = await Showtime.findOne({ movie_id: movieId, start_time: { $lte: new Date() } }).select('_id start_time').lean();
+        if (!showtime) {
+            return res.status(403).json({ message: 'You can review only after attending the show.' });
+        }
+        const hasBooking = await Booking.exists({ user_id: req.user.userId, showtime_id: showtime._id, status: { $in: ['active', 'accepted'] } });
+        if (!hasBooking) {
+            return res.status(403).json({ message: 'Only users who booked this show can review.' });
+        }
+
         const review = await Review.findOneAndUpdate(
             { _id: reviewId, movieId, userId: req.user.userId },
             { rating, comment },
@@ -135,7 +157,23 @@ exports.getMyReview = async (req, res, next) => {
             return res.status(400).json({ message: 'Invalid movie ID format' });
         }
         const review = await Review.findOne({ movieId, userId: req.user.userId }).lean();
-        res.status(200).json({ review });
+
+        // Build eligibility details
+        const now = new Date();
+        const showtimes = await Showtime.find({ movie_id: movieId }).select('_id start_time').lean();
+        const showtimeIds = showtimes.map(st => st._id);
+        let hasBooking = false;
+        let hasPastBooking = false;
+        if (showtimeIds.length) {
+            hasBooking = !!(await Booking.exists({ user_id: req.user.userId, showtime_id: { $in: showtimeIds }, status: { $in: ['active', 'accepted'] } }));
+            const pastShowtimeIds = showtimes.filter(st => st.start_time <= now).map(st => st._id);
+            if (pastShowtimeIds.length) {
+                hasPastBooking = !!(await Booking.exists({ user_id: req.user.userId, showtime_id: { $in: pastShowtimeIds }, status: { $in: ['active', 'accepted'] } }));
+            }
+        }
+        const eligible = hasPastBooking;
+
+        res.status(200).json({ review, eligible, hasBooking, hasPastBooking });
     } catch (error) {
         next(error);
     }

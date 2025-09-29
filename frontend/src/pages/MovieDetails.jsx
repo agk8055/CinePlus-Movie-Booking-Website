@@ -32,6 +32,8 @@ const MovieDetails = () => {
     const { isAuthenticated, user } = useContext(UserContext);
     const [menuOpenReviewId, setMenuOpenReviewId] = useState(null);
     const [isEditingMyReview, setIsEditingMyReview] = useState(false);
+    const [myEligible, setMyEligible] = useState(false);
+    const [myHasBooking, setMyHasBooking] = useState(false);
     const [notice, setNotice] = useState("");
 
     // Effect for fetching main movie details (runs only when 'id' changes)
@@ -121,6 +123,8 @@ const MovieDetails = () => {
             if (!id || !isAuthenticated) return;
             try {
                 const res = await getMyReview(id);
+                setMyEligible(!!res?.eligible);
+                setMyHasBooking(!!res?.hasBooking);
                 if (res && res.review) {
                     setMyReviewId(res.review._id);
                     setMyRating(res.review.rating || 0);
@@ -192,20 +196,21 @@ const MovieDetails = () => {
         return (
             <div style={{ position: 'relative', width: 24, height: 24, display: 'inline-block' }}>
                 <svg viewBox="0 0 24 24" width="24" height="24" style={{ position: 'absolute', top: 0, left: 0 }}>
-                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="#333" />
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="#444" />
                 </svg>
                 <div style={{ position: 'absolute', top: 0, left: 0, width: `${clamped * 100}%`, height: '100%', overflow: 'hidden' }}>
                     <svg viewBox="0 0 24 24" width="24" height="24">
-                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="#f5c518" />
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" fill="#75d402" />
                     </svg>
                 </div>
             </div>
         );
     };
 
-    const StarRating = ({ value, onChange }) => {
+    const StarRating = ({ value, onChange, readOnly = false }) => {
         const stars = [0,1,2,3,4];
         const handleClick = (index, e) => {
+            if (readOnly) return;
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const half = x < rect.width / 2 ? 0.5 : 1;
@@ -213,11 +218,11 @@ const MovieDetails = () => {
             onChange(newValue);
         };
         return (
-            <div style={{ display: 'inline-flex', gap: 4 }}>
+            <div className={`star-rating ${readOnly ? 'read-only' : ''}`} style={{ display: 'inline-flex', gap: 4 }}>
                 {stars.map((i) => {
                     const fill = Math.max(0, Math.min(1, value - i));
                     return (
-                        <div key={i} onClick={(e) => handleClick(i, e)} style={{ cursor: 'pointer' }}>
+                        <div key={i} onClick={(e) => handleClick(i, e)} style={{ cursor: readOnly ? 'default' : 'pointer' }}>
                             <Star fill={fill} />
                         </div>
                     );
@@ -250,6 +255,8 @@ const MovieDetails = () => {
             alert('Trailer link not available for this movie.');
         }
     };
+    
+    const otherReviews = reviews.filter(r => r._id !== myReviewId);
 
     return (
         <div className="movie-details-wrapper">
@@ -343,104 +350,109 @@ const MovieDetails = () => {
                         </div>
                     </div>
                 {/* Reviews Section */}
-                <div className="reviews-section" style={{ marginTop: '24px' }}>
-                    <h3>Reviews</h3>
+                <div className="reviews-section">
+                    <h3>Reviews & Ratings</h3>
                     {notice && (
-                        <div style={{ margin: '8px 0 12px', padding: '10px 12px', background: '#12371d', border: '1px solid #1e6b2e', color: '#9ff6b1', borderRadius: 6 }}>
+                        <div className="review-notice">
                             {notice}
                         </div>
                     )}
                     {isAuthenticated && (
                         <>
                             {myReviewId && !isEditingMyReview ? (
-                                <div style={{ marginBottom: '16px', padding: '12px', border: '1px solid #333', borderRadius: 8, position: 'relative' }}>
+                                <div className="my-review-card">
                                     <button 
                                         type="button"
                                         aria-label="More options"
                                         onClick={() => setMenuOpenReviewId(menuOpenReviewId === 'mine' ? null : 'mine')}
-                                        style={{ position: 'absolute', right: 8, top: 8, background: 'transparent', color: '#ddd', border: 'none', cursor: 'pointer', fontSize: 18, padding: 4 }}
+                                        className="review-menu-btn"
                                     >
                                         ⋮
                                     </button>
                                     {menuOpenReviewId === 'mine' && (
-                                        <div style={{ position: 'absolute', right: 8, top: 32, background: '#1e1e1e', border: '1px solid #333', borderRadius: 6, minWidth: 120, zIndex: 3 }}>
-                                            <button type="button" onClick={() => { setIsEditingMyReview(true); setMenuOpenReviewId(null); }} style={{ width: '100%', textAlign: 'left', padding: '8px 12px', background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>Edit</button>
-                                            <button type="button" onClick={() => { setMenuOpenReviewId(null); handleDeleteMyReview(); }} style={{ width: '100%', textAlign: 'left', padding: '8px 12px', background: 'transparent', color: '#ff5f5f', border: 'none', cursor: 'pointer' }}>Delete</button>
+                                        <div className="review-menu">
+                                            {myEligible && (
+                                                <button type="button" onClick={() => { setIsEditingMyReview(true); setMenuOpenReviewId(null); }}>Edit</button>
+                                            )}
+                                            <button type="button" onClick={() => { setMenuOpenReviewId(null); handleDeleteMyReview(); }} className="delete-btn">Delete</button>
                                         </div>
                                     )}
-                                    <div style={{ marginBottom: 6, fontWeight: 600 }}>Your review</div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                                        <StarRating value={myRating} onChange={() => {}} />
-                                        <span>{myRating.toFixed(1)} / 5</span>
+                                    <div className="review-header">
+                                        <img src={user?.profile_picture || 'https://ui-avatars.com/api/?background=222&color=fff&name=' + encodeURIComponent(user?.name || 'U')}
+                                            alt="avatar"
+                                            className="review-avatar" />
+                                        <div className="review-meta">
+                                            <div className="review-author">Your Review</div>
+                                            <div className="star-rating-display">
+                                                <StarRating value={myRating} readOnly={true} />
+                                                <span className="rating-value">{myRating.toFixed(1)} / 5</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    {myComment && <div style={{ opacity: 0.9 }}>{myComment}</div>}
+                                    {myComment && (
+                                        <div className="review-body">
+                                            <p className="review-comment">{myComment}</p>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
-                                <form onSubmit={handleSubmitReview} className="review-form" style={{ marginBottom: '16px', display: 'grid', gap: '8px' }}>
-                                    <div>
-                                        <div style={{ marginBottom: 6 }}>Your Rating:</div>
-                                        <StarRating value={myRating} onChange={setMyRating} />
-                                        <div style={{ marginLeft: 8, display: 'inline-block' }}>{myRating ? myRating.toFixed(1) : ''}</div>
-                                    </div>
-                                    <label>
-                                        Comment (optional):
-                                        <textarea value={myComment} onChange={(e) => setMyComment(e.target.value)} rows={3} />
-                                    </label>
-                                    <div style={{ display: 'flex', gap: 8 }}>
-                                        <button type="submit">{myReviewId ? 'Save Changes' : 'Submit Review'}</button>
-                                        {myReviewId && (
-                                            <button type="button" onClick={() => setIsEditingMyReview(false)}>Cancel</button>
-                                        )}
-                                    </div>
-                                </form>
+                                <>
+                                    {myEligible ? (
+                                        <form onSubmit={handleSubmitReview} className="review-form">
+                                            <div className="form-group">
+                                                <label>Your Rating</label>
+                                                <div className="rating-group">
+                                                    <StarRating value={myRating} onChange={setMyRating} />
+                                                    <div className="rating-value-display">{myRating ? myRating.toFixed(1) : '0.0'}</div>
+                                                </div>
+                                            </div>
+                                            <div className="form-group">
+                                                <label htmlFor="review-comment">Your Comment (optional)</label>
+                                                <textarea id="review-comment" value={myComment} onChange={(e) => setMyComment(e.target.value)} rows={4} placeholder="Share your thoughts about the movie..."/>
+                                            </div>
+                                            <div className="form-actions">
+                                                <button type="submit">{myReviewId ? 'Save Changes' : 'Submit Review'}</button>
+                                                {myReviewId && isEditingMyReview && (
+                                                    <button type="button" onClick={() => setIsEditingMyReview(false)} className="cancel-btn">Cancel</button>
+                                                )}
+                                            </div>
+                                        </form>
+                                    ) : (
+                                        <div className="review-notice">{myHasBooking ? 'You can review this movie after your show has ended.' : 'First book ticket to review.'}</div>
+                                    )}
+                                </>
                             )}
                         </>
                     )}
-                    {isReviewsLoading && reviews.length === 0 ? (
+                    {isReviewsLoading && otherReviews.length === 0 ? (
                         <p>Loading reviews...</p>
                     ) : (
-                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                            {reviews.map((r) => {
-                                const isMine = !!(user && r.userId && (r.userId._id === user._id));
-                                return (
-                                    <li key={r._id} style={{ padding: '12px 0', borderBottom: '1px solid #333', position: 'relative', display: 'grid', gridTemplateColumns: '40px 1fr', gap: 12 }}>
-                                        {isMine && (
-                                            <div style={{ position: 'absolute', right: 0, top: 12 }}>
-                                                <button 
-                                                    type="button" 
-                                                    aria-label="More options" 
-                                                    onClick={() => setMenuOpenReviewId(menuOpenReviewId === r._id ? null : r._id)}
-                                                    style={{ background: 'transparent', color: '#ddd', border: 'none', cursor: 'pointer', fontSize: 18 }}
-                                                >
-                                                    ⋮
-                                                </button>
-                                                {menuOpenReviewId === r._id && (
-                                                    <div style={{ position: 'absolute', right: 0, marginTop: 6, background: '#1e1e1e', border: '1px solid #333', borderRadius: 6, minWidth: 120, zIndex: 2 }}>
-                                                        <button type="button" onClick={() => { setMyReviewId(r._id); setMyRating(r.rating || 0); setMyComment(r.comment || ""); setMenuOpenReviewId(null); }} style={{ width: '100%', textAlign: 'left', padding: '8px 12px', background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer' }}>Edit</button>
-                                                        <button type="button" onClick={() => { setMenuOpenReviewId(null); handleDeleteMyReview(); }} style={{ width: '100%', textAlign: 'left', padding: '8px 12px', background: 'transparent', color: '#ff5f5f', border: 'none', cursor: 'pointer' }}>Delete</button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-                                        <div>
-                                            <img src={r.userId?.profile_picture || 'https://ui-avatars.com/api/?background=222&color=fff&name=' + encodeURIComponent(r.userId?.name || 'U')}
-                                                 alt="avatar"
-                                                 style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+                        <ul className="reviews-list">
+                            {otherReviews.map((r) => (
+                                <li key={r._id} className="review-card">
+                                    <div className="review-header">
+                                        <img src={r.userId?.profile_picture || 'https://ui-avatars.com/api/?background=222&color=fff&name=' + encodeURIComponent(r.userId?.name || 'U')}
+                                            alt="avatar"
+                                            className="review-avatar" />
+                                        <div className="review-meta">
+                                            <div className="review-author">{r.userId?.name || 'User'}</div>
+                                            <div className="review-date">{new Date(r.createdAt).toLocaleDateString("en-GB", { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                                         </div>
-                                        <div>
-                                            <div style={{ fontWeight: 600, paddingRight: 40 }}>{r.userId?.name || 'User'}</div>
-                                            <div>Rating: {r.rating} / 5</div>
-                                            {r.comment && <div style={{ opacity: 0.9 }}>{r.comment}</div>}
-                                            <div style={{ fontSize: '12px', opacity: 0.7 }}>{new Date(r.createdAt).toLocaleString()}</div>
+                                    </div>
+                                    <div className="review-body">
+                                        <div className="star-rating-display" style={{ marginBottom: '1rem' }}>
+                                            <StarRating value={r.rating} readOnly={true} />
+                                            <span className="rating-value">{r.rating.toFixed(1)} / 5</span>
                                         </div>
-                                    </li>
-                                );
-                            })}
+                                        {r.comment && <p className="review-comment">{r.comment}</p>}
+                                    </div>
+                                </li>
+                            ))}
                         </ul>
                     )}
                     {reviewsHasMore && (
-                        <button disabled={isReviewsLoading} onClick={() => setReviewsPage(p => p + 1)} style={{ marginTop: '12px' }}>
-                            {isReviewsLoading ? 'Loading...' : 'Load more'}
+                        <button disabled={isReviewsLoading} onClick={() => setReviewsPage(p => p + 1)} className="load-more-reviews">
+                            {isReviewsLoading ? 'Loading...' : 'Load More Reviews'}
                         </button>
                     )}
                 </div>
