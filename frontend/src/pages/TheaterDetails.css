@@ -15,9 +15,17 @@
     padding: 2rem;
 }
 
+.theater-name-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem; /* Add some space between title and button */
+    margin-bottom: 0.5rem;
+}
+
 .theater-info-header h1 {
     font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0; /* Remove bottom margin as it's on the container now */
     background: linear-gradient(135deg, #75d402 0%, #b4ec51 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -34,11 +42,39 @@
     letter-spacing: 1px;
 }
 
+/* --- Like Button Styles --- */
+.like-theater-btn {
+    background: transparent;
+    border: none;
+    color: #75d402;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px; /* Clickable area */
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.like-theater-btn:hover {
+    transform: scale(1.15); /* Enlarge icon on hover */
+}
+
+.like-theater-btn.liked {
+    color: #75d402; /* Use theme color for the liked icon */
+}
+
+/* No special hover for liked, the default scale is enough */
+.like-theater-btn.liked:hover {
+}
+
+
 /* Date Selector */
 .theater-date-selector {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.25rem;
     margin-bottom: 2rem;
     padding: 0 2rem;
 }
@@ -47,14 +83,16 @@
     background: #1a1a1a;
     border: 1px solid #333;
     border-radius: 8px;
-    padding: 1rem;
+    padding: 0.5rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
     color: #fff;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .date-card:hover {
@@ -80,9 +118,9 @@
 }
 
 .date-day {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 600;
-    line-height: 1;
+    line-height: 1.2;
 }
 
 .date-month {
