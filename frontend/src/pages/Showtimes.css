@@ -134,7 +134,13 @@
 .theaters-list { display: grid; gap: 1.5rem; margin-top: 2rem; }
 .theater-card { background: #1a1a1a; border-radius: 12px; padding: 1.5rem; border: 1px solid #2d2d2d; }
 .theater-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid #333; }
-.theater-header h3 { font-size: 1.2rem; color: #eee; font-weight: 600; }
+.theater-title-row { display: inline-flex; align-items: center; gap: 0.6rem; }
+.theater-header h3 { font-size: 1.2rem; color: #eee; font-weight: 600; margin: 0; }
+.like-theater-inline-btn { display: inline-flex; align-items: center; justify-content: center; color: #75d402; cursor: pointer; transition: color 0.2s ease, transform 0.15s ease; background: transparent; border: none; padding: 0; }
+.like-theater-inline-btn:hover { color: #8eff00; transform: translateY(-1px); }
+.like-theater-inline-btn svg { display: block; }
+.like-theater-inline-btn.liked { color: #a1e85c; }
+.like-theater-inline-btn.liked:hover { color: #baff66; }
 .theater-info-link { color: #75d402; text-decoration: none; font-size: 0.85rem; transition: opacity 0.3s ease; display: inline-flex; align-items: center; gap: 0.3rem; }
 .theater-info-link i { font-size: 1em; }
 .theater-info-link:hover { opacity: 0.8; }

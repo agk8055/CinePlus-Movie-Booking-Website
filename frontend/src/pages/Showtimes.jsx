@@ -1,8 +1,9 @@
 // frontend/src/pages/Showtimes.jsx
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import moment from 'moment-timezone';
-import { getShowtimesByMovie, getMovieById } from "../api/api"; // Ensure path is correct
+import { getShowtimesByMovie, getMovieById, likeTheater, unlikeTheater } from "../api/api"; // Ensure path is correct
+import { UserContext } from "../context/UserContext";
 import { useCity } from "../context/CityContext";
 import "./Showtimes.css";
 
@@ -29,6 +30,7 @@ const Showtimes = () => {
     const [datesWithShows, setDatesWithShows] = useState({});
     const [loadingDateAvailability, setLoadingDateAvailability] = useState(false);
     const [firstDateWithShows, setFirstDateWithShows] = useState(null);
+    const { isAuthenticated, user, setUser } = useContext(UserContext);
 
     // State for collapsible filters - starts visible for desktop logic
     const [isFilterVisible, setIsFilterVisible] = useState(true);
@@ -262,12 +264,50 @@ const Showtimes = () => {
             </div>
 
              {/* Theaters and Showtimes List */}
-             {loadingShowtimes ? ( <div className="loading">Loading Showtimes...</div> )
-             : Object.keys(groupedShowtimes).length > 0 ? (
-                 <div className="theaters-list">
-                     {Object.entries(groupedShowtimes).map(([theaterName, { showtimes: theaterShowtimes, theaterId }]) => (
-                         <div key={theaterId || theaterName} className="theater-card">
-                             <div className="theater-header"> <h3>{theaterName}</h3> {theaterId && <Link to={`/theaters/${theaterId}`} className="theater-info-link">Info</Link>} </div>
+            {loadingShowtimes ? ( <div className="loading">Loading Showtimes...</div> )
+            : Object.keys(groupedShowtimes).length > 0 ? (
+                <div className="theaters-list">
+                    {Object.entries(groupedShowtimes)
+                        .sort((a, b) => {
+                            const aId = a[1].theaterId; const bId = b[1].theaterId;
+                            const aLiked = isAuthenticated && Array.isArray(user?.likedTheaters) && user.likedTheaters.some(id => String(id) === String(aId));
+                            const bLiked = isAuthenticated && Array.isArray(user?.likedTheaters) && user.likedTheaters.some(id => String(id) === String(bId));
+                            if (aLiked === bLiked) return 0; return aLiked ? -1 : 1;
+                        })
+                        .map(([theaterName, { showtimes: theaterShowtimes, theaterId }]) => (
+                        <div key={theaterId || theaterName} className="theater-card">
+                            <div className="theater-header">
+                                <div className="theater-title-row">
+                                    <h3>{theaterName}</h3>
+                                    {theaterId && isAuthenticated && (
+                                        <button
+                                            className={`like-theater-inline-btn ${Array.isArray(user?.likedTheaters) && user.likedTheaters.some(id => String(id) === String(theaterId)) ? 'liked' : ''}`}
+                                            onClick={async (e) => {
+                                                e.preventDefault();
+                                                try {
+                                                    const isLiked = Array.isArray(user?.likedTheaters) && user.likedTheaters.some(id => String(id) === String(theaterId));
+                                                    const data = isLiked ? await unlikeTheater(theaterId) : await likeTheater(theaterId);
+                                                    if (setUser && user) {
+                                                        setUser({ ...user, likedTheaters: data.likedTheaters, movieNotifications: data.movieNotifications });
+                                                    }
+                                                } catch (err) {
+                                                    console.error('Failed to toggle like', err);
+                                                    alert(err?.response?.data?.message || 'Failed to update like');
+                                                }
+                                            }}
+                                            aria-label={Array.isArray(user?.likedTheaters) && user.likedTheaters.some(id => String(id) === String(theaterId)) ? 'Unlike theatre' : 'Like theatre'}
+                                            title={Array.isArray(user?.likedTheaters) && user.likedTheaters.some(id => String(id) === String(theaterId)) ? 'Unlike theatre' : 'Like theatre'}
+                                        >
+                                            {Array.isArray(user?.likedTheaters) && user.likedTheaters.some(id => String(id) === String(theaterId)) ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M2 9.137C2 14 6.02 16.591 8.962 18.911C10 19.729 11 20.5 12 20.5s2-.77 3.038-1.59C17.981 16.592 22 14 22 9.138c0-4.863-5.5-8.312-10-3.636C7.5.825 2 4.274 2 9.137Z"/></svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="m8.962 18.91l.464-.588l-.464.589ZM12 5.5l-.54.52a.75.75 0 0 0 1.08 0L12 5.5Zm3.038 13.41l.465.59l-.465-.59Zm-5.612-.588C7.91 17.127 6.253 15.96 4.938 14.48C3.65 13.028 2.75 11.334 2.75 9.137h-1.5c0 2.666 1.11 4.7 2.567 6.339c1.43 1.61 3.254 2.9 4.68 4.024l.93-1.178ZM2.75 9.137c0-2.15 1.215-3.954 2.874-4.713c1.612-.737 3.778-.541 5.836 1.597l1.08-1.04C10.1 2.444 7.264 2.025 5 3.06C2.786 4.073 1.25 6.425 1.25 9.137h1.5ZM8.497 19.5c.513.404 1.063.834 1.62 1.16c.557.325 1.193.59 1.883.59v-1.5c-.31 0-.674-.12-1.126-.385c-.453-.264-.922-.628-1.448-1.043L8.497 19.5Zm7.006 0c1.426-1.125 3.25-2.413 4.68-4.024c1.457-1.64 2.567-3.673 2.567-6.339h-1.5c0 2.197-.9 3.891-2.188 5.343c-1.315 1.48-2.972 2.647-4.488 3.842l.929 1.178ZM22.75 9.137c0-2.712-1.535-5.064-3.75-6.077c-2.264-1.035-5.098-.616-7.54 1.92l1.08 1.04c2.058-2.137 4.224-2.333 5.836-1.596c1.659.759 2.874 2.562 2.874 4.713h1.5Zm-8.176 9.185c-.526.415-.995.779-1.448 1.043c-.452.264-.816.385-1.126.385v1.5c.69 0 1.326-.265 1.883-.59c.558-.326 1.107-.756 1.62-1.16l-.929-1.178Z"/></svg>
+                                            )}
+                                        </button>
+                                    )}
+                                </div>
+                                {theaterId && <Link to={`/theaters/${theaterId}`} className="theater-info-link">Info</Link>}
+                            </div>
                              <div className="showtimes-grid">
                                  {theaterShowtimes.map(showtime => {
                                     const screenIdForLink = showtime.screen_id?._id || showtime.screen_id;
