@@ -38,6 +38,20 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin', 'theater_admin'],
         default: 'user',
     },
+    likedTheaters: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Theater',
+            default: undefined
+        }
+    ],
+    movieNotifications: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Movie',
+            default: undefined
+        }
+    ],
 }, {
     // Include createdAt and updatedAt timestamps
     timestamps: true,

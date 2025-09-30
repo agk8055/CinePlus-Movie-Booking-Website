@@ -332,7 +332,7 @@ exports.getMe = async (req, res) => {
             const theater = await Theater.findOne({ user_id: userId });
             if (theater) theater_id = theater._id;
         }
-        res.status(200).json({ userId: user._id, name: user.name, email: user.email, role: user.role, phone_number: user.phone_number, profile_picture: user.profile_picture, theater_id });
+        res.status(200).json({ userId: user._id, name: user.name, email: user.email, role: user.role, phone_number: user.phone_number, profile_picture: user.profile_picture, theater_id, likedTheaters: user.likedTheaters || [], movieNotifications: user.movieNotifications || [] });
     } catch (error) {
         console.error('Error fetching user profile:', error);
         res.status(500).json({ message: 'Failed to fetch user profile' });

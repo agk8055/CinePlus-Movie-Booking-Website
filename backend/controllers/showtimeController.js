@@ -10,6 +10,8 @@ const Screen = require('../models/Screen');
 const Theater = require('../models/Theater');
 const Seat = require('../models/Seat');
 const Booking = require('../models/Booking');
+const User = require('../models/User');
+const sendEmail = require('../utils/emailService');
 
 // Define Target Timezone and Buffer
 const TARGET_TIMEZONE = 'Asia/Kolkata';
@@ -349,6 +351,46 @@ exports.createShowtime = async (req, res, next) => {
             language, status: 'scheduled'
         };
         const newShowtime = await Showtime.create(newShowtimeData);
+
+        // 8. Notify interested users (booking now available)
+        try {
+            const theaterId = screenExists.theater_id;
+            const movieId = newMovie._id;
+
+            const interestedUsers = await User.find({
+                movieNotifications: movieId,
+                likedTheaters: theaterId
+            }).select('email name').lean();
+
+            if (interestedUsers && interestedUsers.length > 0) {
+                const theater = await Theater.findById(theaterId).select('name city').lean();
+                const movie = await Movie.findById(movieId).select('title').lean();
+                const startTimeLocal = moment.tz(newShowStartTimeMoment, TARGET_TIMEZONE).format('MMM D, YYYY h:mm A');
+
+                const emailSubject = `Booking now open: ${movie?.title || 'A movie'} at ${theater?.name || 'your liked theater'}`;
+                for (const u of interestedUsers) {
+                    const html = `
+                        <div style="font-family: Arial, Helvetica, sans-serif; padding:16px">
+                            <h2 style="margin:0 0 12px">Booking Now Available</h2>
+                            <p>Hi ${u.name || 'there'},</p>
+                            <p>Booking has started for <strong>${movie?.title || 'the movie'}</strong> at <strong>${theater?.name || 'your liked theater'}</strong>${theater?.city ? `, ${theater.city}` : ''}.</p>
+                            <p>First show: <strong>${startTimeLocal} (${TARGET_TIMEZONE})</strong></p>
+                            <p style="margin-top:16px">Open the app to book your seats now.</p>
+                            <hr/>
+                            <p style="font-size:12px;color:#666">You received this because you enabled notifications for this movie in your liked theatres. You can turn this off from the movie page.</p>
+                        </div>`;
+                    const text = `Booking Now Available\n\nMovie: ${movie?.title || ''}\nTheatre: ${theater?.name || ''}${theater?.city ? ', ' + theater.city : ''}\nFirst show: ${startTimeLocal} (${TARGET_TIMEZONE})\n\nOpen the app to book your seats. You can turn off notifications on the movie page.`;
+                    try {
+                        await sendEmail({ email: u.email, subject: emailSubject, html, message: text });
+                    } catch (e) {
+                        console.error('Failed to send booking available email to', u.email, e.message);
+                    }
+                }
+            }
+        } catch (notifyErr) {
+            console.error('Error during booking availability notifications:', notifyErr);
+        }
+
         res.status(201).json({ message: 'Showtime created successfully', showtime: newShowtime });
 
     } catch (error) {

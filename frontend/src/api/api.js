@@ -403,4 +403,25 @@ export const uploadProfilePicture = async (file) => {
     return response.data;
 };
 
+// --- User Likes & Notifications ---
+export const likeTheater = async (theaterId) => {
+    const response = await api.post(`/users/liked-theaters/${theaterId}`);
+    return response.data; // { likedTheaters, movieNotifications }
+};
+
+export const unlikeTheater = async (theaterId) => {
+    const response = await api.delete(`/users/liked-theaters/${theaterId}`);
+    return response.data;
+};
+
+export const enableMovieNotification = async (movieId) => {
+    const response = await api.post(`/users/movie-notifications/${movieId}`);
+    return response.data;
+};
+
+export const disableMovieNotification = async (movieId) => {
+    const response = await api.delete(`/users/movie-notifications/${movieId}`);
+    return response.data;
+};
+
 export default api;

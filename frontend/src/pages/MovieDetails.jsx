@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMovieById, getMovieBookingStats, getReviewsByMovie, addOrUpdateMyReview, getMyReview, deleteMyReview } from "../api/api";
+import { getMovieById, getMovieBookingStats, getReviewsByMovie, addOrUpdateMyReview, getMyReview, deleteMyReview, enableMovieNotification, disableMovieNotification } from "../api/api";
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
 import { FastAverageColor } from 'fast-average-color';
@@ -47,7 +47,7 @@ const MovieDetails = () => {
     const [myRating, setMyRating] = useState(0);
     const [myComment, setMyComment] = useState("");
     const [myReviewId, setMyReviewId] = useState(null);
-    const { isAuthenticated, user } = useContext(UserContext);
+    const { isAuthenticated, user, setUser } = useContext(UserContext);
     const [menuOpenReviewId, setMenuOpenReviewId] = useState(null);
     const [isEditingMyReview, setIsEditingMyReview] = useState(false);
     const [myEligible, setMyEligible] = useState(false);
@@ -275,6 +275,26 @@ const MovieDetails = () => {
     };
     
     const otherReviews = reviews.filter(r => r._id !== myReviewId);
+    const isFutureRelease = new Date(movie.release_date) > new Date();
+    const notificationsOn = isAuthenticated && Array.isArray(user?.movieNotifications) && user.movieNotifications.some(mId => String(mId) === String(id));
+
+    const toggleMovieNotification = async () => {
+        if (!isAuthenticated) { alert('Please login to manage notifications.'); return; }
+        try {
+            let data;
+            if (notificationsOn) {
+                data = await disableMovieNotification(id);
+            } else {
+                data = await enableMovieNotification(id);
+            }
+            if (setUser && user) {
+                setUser({ ...user, likedTheaters: data.likedTheaters, movieNotifications: data.movieNotifications });
+            }
+        } catch (e) {
+            console.error('Failed to toggle movie notification', e);
+            alert(e?.response?.data?.message || 'Failed to update notification');
+        }
+    };
 
     return (
         <div className="movie-details-wrapper">
@@ -368,6 +388,11 @@ const MovieDetails = () => {
                                 </svg>
                                 Watch Trailer
                             </button>
+                            {isFutureRelease && isAuthenticated && (
+                                <button className={`notify-toggle-btn ${notificationsOn ? 'on' : 'off'}`} onClick={toggleMovieNotification} aria-pressed={notificationsOn}>
+                                    {notificationsOn ? 'Notifications: ON' : 'Notify me when booking starts in my liked theatres'}
+                                </button>
+                            )}
                         </div>
                     </div>
                 {/* Reviews Section */}

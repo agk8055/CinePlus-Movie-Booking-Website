@@ -1,9 +1,11 @@
 // src/pages/TheaterDetails.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 // *** Corrected Import Name ***
 import { getTheaterDetails, getShowtimesByTheaterId } from "../api/api";
 import moment from 'moment-timezone'; // Import moment-timezone
+import { UserContext } from "../context/UserContext";
+import { likeTheater, unlikeTheater } from "../api/api";
 import "./TheaterDetails.css"; // Ensure this CSS file exists and is styled
 // import { useCity } from "../context/CityContext"; // Keep if needed elsewhere, but not used in this component's logic
 
@@ -23,6 +25,8 @@ const TheaterDetails = () => {
     const [loadingTheater, setLoadingTheater] = useState(true);
     const [loadingShowtimes, setLoadingShowtimes] = useState(false);
     const [error, setError] = useState(null);
+    const { isAuthenticated, user, setUser } = useContext(UserContext);
+    const [isLiked, setIsLiked] = useState(false);
 
     // Effect to fetch Theater Details
     useEffect(() => {
@@ -51,6 +55,13 @@ const TheaterDetails = () => {
 
         return () => { isMounted = false; }; // Cleanup function
     }, [theaterId]); // Re-run only if theaterId changes
+
+    // Sync local like state with user context
+    useEffect(() => {
+        if (!isAuthenticated || !user) { setIsLiked(false); return; }
+        const liked = Array.isArray(user.likedTheaters) && user.likedTheaters.some(id => String(id) === String(theaterId));
+        setIsLiked(liked);
+    }, [isAuthenticated, user, theaterId]);
 
     // Effect to fetch Showtimes when theaterId or selectedDate changes
     useEffect(() => {
@@ -238,6 +249,26 @@ const TheaterDetails = () => {
         setSelectedDate(date);
     };
 
+    const toggleLike = async () => {
+        if (!isAuthenticated) { alert('Please login to like theatres.'); return; }
+        try {
+            let data;
+            if (isLiked) {
+                data = await unlikeTheater(theaterId);
+            } else {
+                data = await likeTheater(theaterId);
+            }
+            setIsLiked(!isLiked);
+            // update user context minimal fields
+            if (setUser && user) {
+                setUser({ ...user, likedTheaters: data.likedTheaters, movieNotifications: data.movieNotifications });
+            }
+        } catch (e) {
+            console.error('Failed to toggle like', e);
+            alert(e?.response?.data?.message || 'Failed to update like');
+        }
+    };
+
     // --- Render Logic ---
     if (loadingTheater) return <div className="loading">Loading Theater Details...</div>;
     // Show error only if theater details failed to load initially
@@ -250,6 +281,11 @@ const TheaterDetails = () => {
             <div className="theater-info-header">
                 <h1>{theater.name}</h1>
                 <p className="theater-location">{theater.location || 'Location not specified'}, {theater.city || 'City not specified'}</p>
+                {isAuthenticated && (
+                    <button onClick={toggleLike} className={`like-theater-btn ${isLiked ? 'liked' : ''}`} aria-pressed={isLiked} aria-label={isLiked ? 'Unlike theatre' : 'Like theatre'}>
+                        {isLiked ? '♥ Liked' : '♡ Like'}
+                    </button>
+                )}
                 {/* Add more theater details here if available */}
             </div>
 
