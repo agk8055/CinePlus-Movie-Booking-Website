@@ -132,7 +132,7 @@ exports.getReviewsForMovie = async (req, res, next) => {
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)
-                .populate('userId', 'name profile_picture')
+                .populate('userId', 'name profile_picture role')
                 .lean(),
             Review.countDocuments({ movieId })
         ]);

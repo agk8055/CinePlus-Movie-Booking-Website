@@ -6,6 +6,24 @@ import { UserContext } from "../context/UserContext";
 import { FastAverageColor } from 'fast-average-color';
 import "./MovieDetails.css";
 
+const VerifiedIcon = ({ role }) => {
+    if (role === 'admin') {
+        return (
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#75d402" viewBox="0 0 24 24" style={{ marginLeft: '8px' }}>
+                <path fillRule="evenodd" d="M12 2c-.791 0-1.55.314-2.11.874l-.893.893a.985.985 0 0 1-.696.288H7.04A2.984 2.984 0 0 0 4.055 7.04v1.262a.986.986 0 0 1-.288.696l-.893.893a2.984 2.984 0 0 0 0 4.22l.893.893a.985.985 0 0 1 .288.696v1.262a2.984 2.984 0 0 0 2.984 2.984h1.262c.261 0 .512.104.696.288l.893.893a2.984 2.984 0 0 0 4.22 0l.893-.893a.985.985 0 0 1 .696-.288h1.262a2.984 2.984 0 0 0 2.984-2.984V15.7c0-.261.104-.512.288-.696l.893-.893a2.984 2.984 0 0 0 0-4.22l-.893-.893a.985.985 0 0 1-.288-.696V7.04a2.984 2.984 0 0 0-2.984-2.984h-1.262a.985.985 0 0 1-.696-.288l-.893-.893A2.984 2.984 0 0 0 12 2Zm3.683 7.73a1 1 0 1 0-1.414-1.413l-4.253 4.253-1.277-1.277a1 1 0 0 0-1.415 1.414l1.985 1.984a1 1 0 0 0 1.414 0l4.96-4.96Z" clipRule="evenodd"/>
+            </svg>
+        );
+    }
+    if (role === 'theater_admin') {
+        return (
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" style={{ marginLeft: '8px' }}>
+                <path stroke="#0275d4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m8.032 12 1.984 1.984 4.96-4.96m4.55 5.272.893-.893a1.984 1.984 0 0 0 0-2.806l-.893-.893a1.984 1.984 0 0 1-.581-1.403V7.04a1.984 1.984 0 0 0-1.984-1.984h-1.262a1.983 1.983 0 0 1-1.403-.581l-.893-.893a1.984 1.984 0 0 0-2.806 0l-.893.893a1.984 1.984 0 0 1-1.403.581H7.04A1.984 1.984 0 0 0 5.055 7.04v1.262c0 .527-.209 1.031-.581 1.403l-.893.893a1.984 1.984 0 0 0 0 2.806l.893.893c.372.372.581.876.581 1.403v1.262a1.984 1.984 0 0 0 1.984 1.984h1.262c.527 0 1.031.209 1.403.581l.893.893a1.984 1.984 0 0 0 2.806 0l.893-.893a1.985 1.985 0 0 1 1.403-.581h1.262a1.984 1.984 0 0 0 1.984-1.984V15.7c0-.527.209-1.031.581-1.403Z"/>
+            </svg>
+        );
+    }
+    return null;
+};
+
 const MovieDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -385,7 +403,9 @@ const MovieDetails = () => {
                                             alt="avatar"
                                             className="review-avatar" />
                                         <div className="review-meta">
-                                            <div className="review-author">Your Review</div>
+                                            <div className="review-author" style={{ display: 'flex', alignItems: 'center' }}>
+                                                Your Review
+                                                <VerifiedIcon role={user?.role} />                                            </div>
                                             <div className="star-rating-display">
                                                 <StarRating value={myRating} readOnly={true} />
                                                 <span className="rating-value">{myRating.toFixed(1)} / 5</span>
@@ -438,7 +458,10 @@ const MovieDetails = () => {
                                             alt="avatar"
                                             className="review-avatar" />
                                         <div className="review-meta">
-                                            <div className="review-author">{r.userId?.name || 'User'}</div>
+                                            <div className="review-author" style={{ display: 'flex', alignItems: 'center' }}>
+                                                {r.userId?.name || 'User'}
+                                                <VerifiedIcon role={r.userId?.role} />
+                                            </div>
                                             <div className="review-date">{new Date(r.createdAt).toLocaleDateString("en-GB", { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                                         </div>
                                     </div>
